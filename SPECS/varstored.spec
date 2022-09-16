@@ -11,6 +11,7 @@ Source0: varstored-1.0.0.tar.gz
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
 BuildRequires: libseccomp-devel
+BuildRequires: gcc
 %{?_cov_buildrequires}
 
 

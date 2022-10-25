@@ -3,10 +3,15 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.0.0
-Release: 2%{?xsrel}%{?dist}
+Release: 2.1%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.0.0.tar.gz
+
+# XCP-ng sources and patches
+Source10: secureboot-certs
+Source11: 00-XCP-ng-varstore-dir.conf
+Patch1000: varstored-1.0.0-change-certs-directory.XCP-ng.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -16,6 +21,9 @@ BuildRequires: gcc
 
 
 Requires: varstored-guard secureboot-certificates
+
+# XCP-ng: transition from uefistored, starting with XCP-ng 8.3
+Obsoletes: uefistored <= 1.3.0
 
 %description
 A daemon for implementing variable services for UEFI guests.
@@ -53,6 +61,14 @@ install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
+# XCP-ng: create /var/lib/varstored for XAPI to write into
+mkdir -p %{buildroot}/var/lib/varstored
+# XCP-ng: add secureboot-certs script
+install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
+# XCP-ng: add 00-XCP-ng-varstore-dir.conf to set the auths dir for XAPI
+mkdir -p %{buildroot}/etc/xapi.conf.d/$
+install -m 0755 %{SOURCE11} %{buildroot}/etc/xapi.conf.d/
+
 %{?_cov_install}
 
 
@@ -60,10 +76,23 @@ install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 make check
 
 
+%post
+# We want a PK to be available even if the pool has not been setup for Secure Boot
+# using secureboot-certs.
+if [ ! -e /var/lib/varstored/PK.auth ];
+then
+    cp -f /usr/share/varstored/PK.auth /var/lib/varstored/PK.auth
+fi
+
+
 %files
 %license LICENSE
 %{_sbindir}/*
 %{_datadir}/%{name}
+# XCP-ng: we read certs from /var/lib/varstored, where XAPI writes them.
+%dir /var/lib/varstored
+# XCP-ng: ... and so we tell XAPI to write them there too.
+/etc/xapi.conf.d/00-XCP-ng-varstore-dir.conf
 
 
 %files tools
@@ -75,6 +104,14 @@ make check
 
 
 %changelog
+* Tue Oct 25 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.1
+- Obsolete uefistored
+- Create the /var/lib/varstored directory for XAPI to write into
+- Add varstored-1.0.0-change-certs-directory.XCP-ng.patch to read certs from /var/lib/varstored
+- Add the secureboot-certs script, formerly provided by uefistored
+- Add /etc/xapi.conf.d/00-XCP-ng-varstore-dir.conf to change the certs dir in XAPI
+- Add %post scriptlet to write PK.auth into /var/lib/varstored if missing
+
 * Mon Mar 07 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.0-2
 - Correct license field
 

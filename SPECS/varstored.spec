@@ -24,7 +24,6 @@ when writing authenticated variables.
 
 
 %package tools
-License: Proprietary and BSD
 Summary: Tools for manipulating a guest's EFI variables offline
 
 

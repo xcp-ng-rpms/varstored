@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.0.0
-Release: 2.2%{?xsrel}%{?dist}
+Release: 2.3%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.0.0.tar.gz
@@ -105,6 +105,9 @@ fi
 
 
 %changelog
+* Thu Oct 27 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.3
+- Fix buggy varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
+
 * Thu Oct 27 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.2
 - Remove dependency to secureboot-certificates, for now
 - Add varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch

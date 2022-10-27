@@ -1,0 +1,21 @@
+diff --git a/handler.c b/handler.c
+index dbaf57e..80873b3 100644
+--- a/handler.c
++++ b/handler.c
+@@ -139,14 +139,14 @@ static const uint8_t EFI_IMAGE_SECURITY_DATABASE2[] = {'d',0,'b',0,'t',0};
+  * in Dom0.
+  */
+ static struct auth_info auth_info[] = {
+-    {"dbx", EFI_IMAGE_SECURITY_DATABASE1, sizeof(EFI_IMAGE_SECURITY_DATABASE1),
+-     &gEfiImageSecurityDatabaseGuid, AUTH_PATH_PREFIX "/dbx.auth", true},
+     {"db", EFI_IMAGE_SECURITY_DATABASE, sizeof(EFI_IMAGE_SECURITY_DATABASE),
+      &gEfiImageSecurityDatabaseGuid, AUTH_PATH_PREFIX "/db.auth", false},
+     {"KEK", EFI_KEY_EXCHANGE_KEY_NAME, sizeof(EFI_KEY_EXCHANGE_KEY_NAME),
+      &gEfiGlobalVariableGuid, AUTH_PATH_PREFIX "/KEK.auth", false},
+     {"PK", EFI_PLATFORM_KEY_NAME, sizeof(EFI_PLATFORM_KEY_NAME),
+      &gEfiGlobalVariableGuid, AUTH_PATH_PREFIX "/PK.auth", false},
++    {"dbx", EFI_IMAGE_SECURITY_DATABASE1, sizeof(EFI_IMAGE_SECURITY_DATABASE1),
++     &gEfiImageSecurityDatabaseGuid, AUTH_PATH_PREFIX "/dbx.auth", true},
+ };
+ 
+ struct efi_variable *var_list;

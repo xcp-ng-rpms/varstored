@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.0.0
-Release: 2.1%{?xsrel}%{?dist}
+Release: 2.2%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.0.0.tar.gz
@@ -12,6 +12,7 @@ Source0: varstored-1.0.0.tar.gz
 Source10: secureboot-certs
 Source11: 00-XCP-ng-varstore-dir.conf
 Patch1000: varstored-1.0.0-change-certs-directory.XCP-ng.patch
+Patch1001: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -20,7 +21,7 @@ BuildRequires: gcc
 %{?_cov_buildrequires}
 
 
-Requires: varstored-guard secureboot-certificates
+Requires: varstored-guard
 
 # XCP-ng: transition from uefistored, starting with XCP-ng 8.3
 Obsoletes: uefistored <= 1.3.0
@@ -104,6 +105,10 @@ fi
 
 
 %changelog
+* Thu Oct 27 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.2
+- Remove dependency to secureboot-certificates, for now
+- Add varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
+
 * Tue Oct 25 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.1
 - Obsolete uefistored
 - Create the /var/lib/varstored directory for XAPI to write into

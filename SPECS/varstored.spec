@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.0.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: 2.4%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.0.0.tar.gz
@@ -12,6 +12,7 @@ Source0: varstored-1.0.0.tar.gz
 Source10: secureboot-certs
 Source11: 00-XCP-ng-varstore-dir.conf
 Patch1000: varstored-1.0.0-change-certs-directory.XCP-ng.patch
+# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1001: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
@@ -105,6 +106,9 @@ fi
 
 
 %changelog
+* Fri Oct 28 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.4
+- Update varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch to match upstream PR
+
 * Thu Oct 27 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.3
 - Fix buggy varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 

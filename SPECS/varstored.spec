@@ -1,12 +1,12 @@
-%global package_speccommit c435d9d005a53a9e0cca15ba7018581168166d47
-%global package_srccommit v1.0.0
+%global package_speccommit daf826acb7b37f85f2b4bf43ccce210310da7d22
+%global package_srccommit v1.1.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.0.0
-Release: 2.4%{?xsrel}%{?dist}
+Version: 1.1.0
+Release: 1.1%{?xsrel}%{?dist}
 
 License: BSD
-Source0: varstored-1.0.0.tar.gz
+Source0: varstored-1.1.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
@@ -106,6 +106,18 @@ fi
 
 
 %changelog
+* Wed Dec 07 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.1.0-1.1
+- Update from XS 8.3 prerelease updates
+- *** Upstream changelog ***
+- * Wed Aug 17 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.1.0-1
+- - varstore-sb-state: only load auth data if needed
+- - xapidb_init: Use BACKEND_INIT_FAILURE
+- - CA-366706: Fix signal handling and possible segfault
+- - CP-39854: Implement Platform Attack Reset Mitigation spec
+- - CP-39864 / CP-40029: Implement PPI support
+- * Tue Jul 26 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.0-3
+- - Fix license of tools subpackage
+
 * Fri Oct 28 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.0.0-2.4
 - Update varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch to match upstream PR
 

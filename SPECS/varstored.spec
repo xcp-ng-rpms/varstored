@@ -1,18 +1,24 @@
-%global package_speccommit daf826acb7b37f85f2b4bf43ccce210310da7d22
-%global package_srccommit v1.1.0
+%global package_speccommit 3b3c1da13a96bd3c67e50d15a34accdd5b196ead
+%global package_srccommit v1.2.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.1.0
+Version: 1.2.0
 Release: 1%{?xsrel}%{?dist}
 
 License: BSD
-Source0: varstored-1.1.0.tar.gz
+Source0: varstored-1.2.0.tar.gz
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
 BuildRequires: libseccomp-devel
 %{?_cov_buildrequires}
 
+# varstored now provides KEK.auth and db.auth that were
+# previously provided by secureboot-certificates.
+Conflicts: secureboot-certificates < 1.0.0-1
+
+# Conflict with old XAPIs since the certificate directory moved.
+Conflicts: xapi-core < 23.6.0-1
 
 Requires: varstored-guard secureboot-certificates
 
@@ -37,7 +43,7 @@ when the guest is not running.
 
 
 %build
-%{?_cov_wrap} make %{?_smp_mflags} varstored tools PK.auth create-auth
+%{?_cov_wrap} make %{?_smp_mflags} varstored tools create-auth auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -48,12 +54,14 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
 %{?_cov_install}
 
+%post
+test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name}
 
 %check
 make check
@@ -74,6 +82,12 @@ make check
 
 
 %changelog
+* Tue Feb 28 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.2.0-1
+- CP-41616: Move varstored auth dir to /var/lib/varstored
+- CA-369046: Log the error code if set_variable_from_auth fails
+- CA-362923: Change output format of create-auth
+- CP-40832: Add standard UEFI Secure Boot certificates
+
 * Wed Aug 17 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.1.0-1
 - varstore-sb-state: only load auth data if needed
 - xapidb_init: Use BACKEND_INIT_FAILURE

@@ -80,19 +80,17 @@ install -m 0755 %{SOURCE11} %{buildroot}/etc/xapi.conf.d/
 %{?_cov_install}
 
 %post
-test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name}
+test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name} || :
 
-%check
-make check
-
-
-%post
-# We want a PK to be available even if the pool has not been setup for Secure Boot
+# XCP-ng: we want a PK to be available even if the pool has not been setup for Secure Boot
 # using secureboot-certs.
 if [ ! -e /var/lib/varstored/PK.auth ];
 then
     cp -f /usr/share/varstored/PK.auth /var/lib/varstored/PK.auth
 fi
+
+%check
+make check
 
 
 %files

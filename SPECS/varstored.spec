@@ -11,9 +11,8 @@ Source0: varstored-1.2.0.tar.gz
 # XCP-ng sources and patches
 Source10: secureboot-certs
 Source11: 00-XCP-ng-varstore-dir.conf
-Patch1000: varstored-1.0.0-change-certs-directory.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
-Patch1001: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
+Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -114,6 +113,7 @@ make check
 %changelog
 * Fri Sep 15 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.1
 - Update to 1.2.0-1
+- Remove varstored-1.0.0-change-certs-directory.XCP-ng.patch
 - *** Upstream changelog ***
 - * Tue Feb 28 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.2.0-1
 - - CP-41616: Move varstored auth dir to /var/lib/varstored

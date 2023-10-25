@@ -3,16 +3,17 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 1.1%{?xsrel}%{?dist}
+Release: 1.2%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
-Source11: 00-XCP-ng-varstore-dir.conf
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
+# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
+Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -68,25 +69,13 @@ install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
-# XCP-ng: create /var/lib/varstored for XAPI to write into
-mkdir -p %{buildroot}/var/lib/varstored
 # XCP-ng: add secureboot-certs script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
-# XCP-ng: add 00-XCP-ng-varstore-dir.conf to set the auths dir for XAPI
-mkdir -p %{buildroot}/etc/xapi.conf.d/$
-install -m 0755 %{SOURCE11} %{buildroot}/etc/xapi.conf.d/
 
 %{?_cov_install}
 
 %post
 test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name} || :
-
-# XCP-ng: we want a PK to be available even if the pool has not been setup for Secure Boot
-# using secureboot-certs.
-if [ ! -e /var/lib/varstored/PK.auth ];
-then
-    cp -f /usr/share/varstored/PK.auth /var/lib/varstored/PK.auth
-fi
 
 %check
 make check
@@ -96,10 +85,6 @@ make check
 %license LICENSE
 %{_sbindir}/*
 %{_datadir}/%{name}
-# XCP-ng: we read certs from /var/lib/varstored, where XAPI writes them.
-%dir /var/lib/varstored
-# XCP-ng: ... and so we tell XAPI to write them there too.
-/etc/xapi.conf.d/00-XCP-ng-varstore-dir.conf
 
 
 %files tools
@@ -111,6 +96,11 @@ make check
 
 
 %changelog
+* Wed Oct 25 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.2
+- Revert part of XCP-ng specific changes, as upstream varstored now uses /var/lib/varstored
+  and certs should be available by default now.
+- Add varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.patch
+
 * Fri Sep 15 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.1
 - Update to 1.2.0-1
 - Remove varstored-1.0.0-change-certs-directory.XCP-ng.patch

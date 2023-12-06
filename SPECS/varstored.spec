@@ -96,6 +96,9 @@ make check
 
 
 %changelog
+* next
+- Update secureboot-certs script for recent UEFI cert handling in XAPI
+
 * Wed Oct 25 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.2
 - Revert part of XCP-ng specific changes, as upstream varstored now uses /var/lib/varstored
   and certs should be available by default now.

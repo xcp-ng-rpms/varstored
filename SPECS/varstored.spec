@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 1.2%{?xsrel}%{?dist}
+Release: 1.3%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -72,6 +72,9 @@ install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 # XCP-ng: add secureboot-certs script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
 
+# XCP-ng: remove KEK and db
+rm %{buildroot}/%{_datadir}/%{name}/{KEK,db}.auth
+
 %{?_cov_install}
 
 %post
@@ -96,8 +99,9 @@ make check
 
 
 %changelog
-* next
+* Wed Dec 13 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.3
 - Update secureboot-certs script for recent UEFI cert handling in XAPI
+- Remove KEK and db cert databases for now, pending legal advice.
 
 * Wed Oct 25 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.2
 - Revert part of XCP-ng specific changes, as upstream varstored now uses /var/lib/varstored

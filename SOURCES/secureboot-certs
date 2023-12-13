@@ -284,7 +284,7 @@ def session_init():
 
 def clear(session):
     for pool in Pool.get_all(session):
-        pool.set_certs(b"")
+        pool.set_custom_certs(b"")
         print("Cleared certificates from XAPI DB for pool %s." % pool.uuid)
 
 
@@ -394,8 +394,8 @@ def install(session, args):
     if not pool:
         print("Could not retrieve pool from XAPI")
         sys.exit(1)
-    pool.set_certs(data)
-    print("Successfully installed certificates to the XAPI DB for pool.")
+    pool.set_custom_certs(data)
+    print("Successfully installed custom certificates to the XAPI DB for pool.")
 
 
 def convert_to_auth(var, path, priv=None):
@@ -543,7 +543,8 @@ class Pool(object):
         attrname = type(self).__name__.lower()
         self.xapi_class = getattr(session.xenapi, attrname)
         self.opaque_ref = opaque_ref
-        self.__certs = None
+        self.__default_certs = None
+        self.__custom_certs = None
 
     @property
     def uuid(self):
@@ -557,17 +558,28 @@ class Pool(object):
         logging.debug("XAPI Request: session.xenapi.%s.get_all()" % attrname)
         return [cls(ref, session) for ref in refs]
 
-    def get_certs(self):
-        if self.__certs is None:
-            self.__certs = self.xapi_class.get_uefi_certificates(self.opaque_ref)
-        return self.__certs
+    def get_default_certs(self):
+        if self.__default_certs is None:
+            self.__default_certs = self.xapi_class.get_uefi_certificates(self.opaque_ref)
+        return self.__default_certs
 
-    def set_certs(self, data):
-        self.xapi_class.set_uefi_certificates(self.opaque_ref, data)
+    def get_custom_certs(self):
+        if self.__custom_certs is None:
+            self.__custom_certs = self.xapi_class.get_custom_uefi_certificates(self.opaque_ref)
+        return self.__custom_certs
+
+    def get_active_certs(self):
+        active_certs = self.get_custom_certs()
+        if not active_certs:
+            active_certs = self.get_default_certs()
+        return active_certs
+
+    def set_custom_certs(self, data):
+        self.xapi_class.set_custom_uefi_certificates(self.opaque_ref, data)
 
     def save_certs_to_disk(self):
         pool = Pool.get_all(self.session)[0]
-        decoded = base64.b64decode(pool.get_certs())
+        decoded = base64.b64decode(pool.get_active_certs())
 
         d = cd_tempdir()
         _, fname = tempfile.mkstemp()
@@ -661,9 +673,9 @@ if __name__ == "__main__":
     action_parsers = parser.add_subparsers()
     install_parser = action_parsers.add_parser(
         Actions.INSTALL,
-        help="Install UEFI certificates to every host in the pool.",
+        help="Install UEFI certificates to the pool.",
         description=(
-            "Install UEFI certificates to every host in the pool.\n\n"
+            "Install UEFI certificates to the pool.\n\n"
             "If no arguments are passed to '{} {}', then the default PK, KEK, "
             "and db, and the latest dbx will be installed.".format(
                 os.path.basename(sys.argv[0]), Actions.INSTALL
@@ -769,10 +781,9 @@ be passed to {} as custom auth files.
     clear_parser = action_parsers.add_parser(
         Actions.CLEAR,
         help=(
-            "Remove all UEFI certificates from the XAPI DB for a pool. "
-            "Note this only removes them from the XAPI DB but "
-            "not from disk. It may be necessary for you to remove the certs in "
-            "/var/lib/varstored/ manually on each affected host."
+            "Remove all user-installed UEFI certificates from the pool. "
+            "The pool will use the default certificates found in "
+            "/usr/share/varstored, if they are present. "
         ),
     )
     clear_parser.set_defaults(action=Actions.CLEAR)
@@ -780,8 +791,8 @@ be passed to {} as custom auth files.
     report_parser = action_parsers.add_parser(
         Actions.REPORT,
         help=(
-            "View a report containing information about the UEFI certificates"
-            "for a pool or every host in the system."
+            "View a report containing information about the active UEFI "
+            "certificates for the pool."
         ),
     )
     report_parser.add_argument(

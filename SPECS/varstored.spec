@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 1.3%{?xsrel}%{?dist}
+Release: 1.3%{?xsrel}.0.xen417.1%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -99,6 +99,9 @@ make check
 
 
 %changelog
+* Thu Feb 08 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-1.3.0.xen417.1
+- Rebuild for Xen 4.17 test build
+
 * Wed Dec 13 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.3
 - Update secureboot-certs script for recent UEFI cert handling in XAPI
 - Remove KEK and db cert databases for now, pending legal advice.

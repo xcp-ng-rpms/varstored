@@ -1,0 +1,117 @@
+From d274ecab3b9af4316075650c3d4a0c09fa51dee8 Mon Sep 17 00:00:00 2001
+From: Andrei Semenov <andrei.semenov@vates.fr>
+Date: Thu, 20 Jul 2023 15:55:51 +0200
+Subject: [PATCH 1/2] Implement secure boot enforcement
+Content-Type: text/plain; charset = "utf-8"
+Content-Transfert-Encoding: 8bit
+
+Depending on a parameter, varstored aborts if secure_boot_enable is activated, but no
+certificates are present.
+
+Signed-off-by: Andrei Semenov <andrei.semenov@vates.fr>
+---
+ handler.c         | 25 +++++++++++++++++++++++++
+ include/handler.h |  2 ++
+ varstored.c       | 16 ++++++++++++++++
+ 3 files changed, 43 insertions(+)
+
+diff --git a/handler.c b/handler.c
+index 9305f88..c5028a4 100644
+--- a/handler.c
++++ b/handler.c
+@@ -166,6 +166,7 @@ static struct auth_info auth_info[] = {
+ 
+ struct efi_variable *var_list;
+ bool secure_boot_enable;
++bool secure_boot_enforce;
+ bool auth_enforce = true;
+ bool persistent = true;
+ 
+@@ -2057,6 +2058,30 @@ void dispatch_command(uint8_t *comm_buf)
+     };
+ }
+ 
++bool
++check_secure_boot(void)
++{
++    EFI_STATUS status;
++    uint8_t *data;
++    UINTN data_len;
++    bool ret;
++
++    if (!secure_boot_enforce)
++        return true;
++
++    status = internal_get_variable(EFI_SECURE_BOOT_MODE_NAME,
++                                   sizeof(EFI_SECURE_BOOT_MODE_NAME),
++                                   &gEfiGlobalVariableGuid, &data, &data_len);
++
++    if (status != EFI_SUCCESS)
++        return false;
++
++    ret = data[0] ? true : false;
++    free(data);
++
++    return ret;
++}
++
+ bool
+ setup_crypto(void)
+ {
+diff --git a/include/handler.h b/include/handler.h
+index 0851836..ff9e124 100644
+--- a/include/handler.h
++++ b/include/handler.h
+@@ -75,6 +75,7 @@ struct efi_variable {
+ extern struct efi_variable *var_list;
+ 
+ void dispatch_command(uint8_t *comm_buf);
++bool check_secure_boot(void);
+ bool setup_crypto(void);
+ bool setup_variables(void);
+ bool setup_keys(void);
+@@ -92,6 +93,7 @@ extern const uint8_t TCG2_PHYSICAL_PRESENCEFLAGSLOCK_NAME[];
+ extern const size_t TCG2_PHYSICAL_PRESENCEFLAGSLOCK_NAME_SIZE;
+ 
+ extern bool secure_boot_enable;
++extern bool secure_boot_enforce;
+ extern bool auth_enforce;
+ extern bool persistent;
+ 
+diff --git a/varstored.c b/varstored.c
+index 08e6fc9..ccff700 100644
+--- a/varstored.c
++++ b/varstored.c
+@@ -189,6 +189,17 @@ initialize_settings(struct xs_handle *xsh, domid_t domid)
+ 
+     INFO("Secure boot enable: %s\n", secure_boot_enable ? "true" : "false");
+ 
++    if (secure_boot_enable) {
++        snprintf(path, sizeof(path),
++                 "/local/domain/%u/platform/secureboot-enforce", domid);
++        s = xs_read(xsh, XBT_NULL, path, NULL);
++
++        secure_boot_enforce = s && !strcmp(s, "true");
++        free(s);
++
++        INFO("Secure boot enforcing: %s\n", secure_boot_enforce ? "true" : "false");
++    }
++
+     snprintf(path, sizeof(path),
+              "/local/domain/%u/platform/auth-enforce", domid);
+     s = xs_read(xsh, XBT_NULL, path, NULL);
+@@ -532,6 +543,11 @@ varstored_initialize(domid_t domid)
+         }
+     }
+ 
++    if (!check_secure_boot()) {
++        ERR("Secure boot is required, but isn't activated\n");
++        goto err;
++    }
++
+     free_auth_data();
+     return true;
+ 
+-- 
+2.43.0
+

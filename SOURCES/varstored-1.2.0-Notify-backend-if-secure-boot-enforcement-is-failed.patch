@@ -1,0 +1,39 @@
+From 5f7ff83c2df9dd7d45de40774adc2cee85fb8faa Mon Sep 17 00:00:00 2001
+From: Andrei Semenov <andrei.semenov@vates.fr>
+Date: Fri, 21 Jul 2023 14:30:55 +0200
+Subject: [PATCH 2/2] Notify backend if secure boot enforcement is failed
+Content-Type: text/plain; charset = "utf-8"
+Content-Transfert-Encoding: 8bit
+
+Signed-off-by: Andrei Semenov <andrei.semenov@vates.fr>
+---
+ handler.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/handler.c b/handler.c
+index c5028a4..e4355ea 100644
+--- a/handler.c
++++ b/handler.c
+@@ -2073,11 +2073,15 @@ check_secure_boot(void)
+                                    sizeof(EFI_SECURE_BOOT_MODE_NAME),
+                                    &gEfiGlobalVariableGuid, &data, &data_len);
+ 
+-    if (status != EFI_SUCCESS)
+-        return false;
++    if (status != EFI_SUCCESS) {
++        ret = false;
++    } else  {
++        ret = data[0] ? true : false;
++        free(data);
++    }
+ 
+-    ret = data[0] ? true : false;
+-    free(data);
++    if (!ret)
++        db->sb_notify();
+ 
+     return ret;
+ }
+-- 
+2.43.0
+

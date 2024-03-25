@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 1.3%{?xsrel}%{?dist}
+Release: 1.3%{?xsrel}.0.sbenforce.1%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -14,6 +14,9 @@ Source10: secureboot-certs
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
 Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.patch
+# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/19
+Patch1002: varstored-1.2.0-Implement-secure-boot-enforcement.patch
+Patch1003: varstored-1.2.0-Notify-backend-if-secure-boot-enforcement-is-failed.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -99,6 +102,9 @@ make check
 
 
 %changelog
+* Fri Mar 22 2024 Thierry Escande <thiery.escande@vates.tech> - 1.2.0-1.3.0.sbenforce.1
+- Implement secure boot enforcement
+
 * Wed Dec 13 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.3
 - Update secureboot-certs script for recent UEFI cert handling in XAPI
 - Remove KEK and db cert databases for now, pending legal advice.

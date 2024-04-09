@@ -1,9 +1,9 @@
-%global package_speccommit 3b3c1da13a96bd3c67e50d15a34accdd5b196ead
+%global package_speccommit a436001f700e5f647bd32b7055b18d3d78774ce5
 %global package_srccommit v1.2.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 1%{?xsrel}%{?dist}
+Release: 2%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -82,6 +82,9 @@ make check
 
 
 %changelog
+* Fri Jan 26 2024 Andrew Cooper <andrew.cooper3@citrix.com> - 1.2.0-2
+- Rebuild against libxenstore.so.4
+
 * Tue Feb 28 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.2.0-1
 - CP-41616: Move varstored auth dir to /var/lib/varstored
 - CA-369046: Log the error code if set_variable_from_auth fails

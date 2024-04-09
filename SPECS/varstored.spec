@@ -1,9 +1,9 @@
-%global package_speccommit 3b3c1da13a96bd3c67e50d15a34accdd5b196ead
+%global package_speccommit a436001f700e5f647bd32b7055b18d3d78774ce5
 %global package_srccommit v1.2.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 1.3%{?xsrel}%{?dist}
+Release: 2.1%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -99,6 +99,12 @@ make check
 
 
 %changelog
+* Tue Apr 09 2024 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-2.1
+- Sync with 1.2.0-2
+- *** Upstream changelog ***
+- * Fri Jan 26 2024 Andrew Cooper <andrew.cooper3@citrix.com> - 1.2.0-2
+- - Rebuild against libxenstore.so.4
+
 * Wed Dec 13 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-1.3
 - Update secureboot-certs script for recent UEFI cert handling in XAPI
 - Remove KEK and db cert databases for now, pending legal advice.

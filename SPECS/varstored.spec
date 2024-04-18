@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.1%{?xsrel}%{?dist}
+Release: 2.2%{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -14,6 +14,9 @@ Source10: secureboot-certs
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
 Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.patch
+# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/23
+Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
+Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -54,7 +57,8 @@ when the guest is not running.
 
 
 %build
-%{?_cov_wrap} make %{?_smp_mflags} varstored tools create-auth auth
+%{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
+              make %{?_smp_mflags} varstored tools create-auth auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -99,6 +103,10 @@ make check
 
 
 %changelog
+* Wed Apr 17 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.2
+- Auth: Add support to make KEK and DB files optional
+- Auth: Enable AUTH_ONLY_PK_REQUIRED build macro
+
 * Tue Apr 09 2024 Samuel Verschelde <stormi-xcp@ylix.fr> - 1.2.0-2.1
 - Sync with 1.2.0-2
 - *** Upstream changelog ***

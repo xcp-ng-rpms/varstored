@@ -58,7 +58,7 @@ when the guest is not running.
 
 %build
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
-              make %{?_smp_mflags} varstored tools create-auth auth
+              make %{?_smp_mflags} varstored tools create-auth PK.auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -69,15 +69,12 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
 # XCP-ng: add secureboot-certs script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
-
-# XCP-ng: remove KEK and db
-rm %{buildroot}/%{_datadir}/%{name}/{KEK,db}.auth
 
 %{?_cov_install}
 

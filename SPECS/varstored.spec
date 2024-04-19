@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.2%{?xsrel}%{?dist}
+Release: 2.3%{?xsrel}%{?dist}
 
 License: BSD
 
@@ -107,6 +107,11 @@ make check
 
 
 %changelog
+* Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
+- Remove generation and installation of KEK and db files
+- Add helper script to remove pem file from source archive
+- Update source archive with pem files removed
+
 * Wed Apr 17 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.2
 - Auth: Add support to make KEK and DB files optional
 - Auth: Enable AUTH_ONLY_PK_REQUIRED build macro

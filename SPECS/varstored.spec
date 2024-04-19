@@ -3,9 +3,16 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.2%{?xsrel}%{?dist}
+Release: 2.3%{?xsrel}%{?dist}
 
 License: BSD
+
+# !!!! YOUR ATTENTION PLEASE !!!!
+# Do not forget to run the script SOURCES/remove-certs-from-tarball.sh on new
+# source archive. This will remove the pem files from the source archive as we
+# are not supposed to distribute them in both RPM and SRPM. (This is why they
+# are removed from archive and not just deleted from the buildroot as it used
+# to be done)
 Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
@@ -55,10 +62,17 @@ when the guest is not running.
 %autosetup -p1
 %{?_cov_prepare}
 
+# Check for pem files in the source archive
+if find certs -name "*.pem" | grep -q pem; then
+  echo "pem files are present in the source archive"
+  echo "Please remove them using the script SOURCES/remove-certs-from-tarball.sh"
+  echo "and push the updated source archive"
+  false
+fi
 
 %build
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
-              make %{?_smp_mflags} varstored tools create-auth auth
+              make %{?_smp_mflags} varstored tools create-auth PK.auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -69,15 +83,12 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
 # XCP-ng: add secureboot-certs script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
-
-# XCP-ng: remove KEK and db
-rm %{buildroot}/%{_datadir}/%{name}/{KEK,db}.auth
 
 %{?_cov_install}
 
@@ -103,6 +114,11 @@ make check
 
 
 %changelog
+* Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
+- Remove generation and installation of KEK and db files
+- Add helper script to remove pem file from source archive
+- Update source archive with pem files removed
+
 * Wed Apr 17 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.2
 - Auth: Add support to make KEK and DB files optional
 - Auth: Enable AUTH_ONLY_PK_REQUIRED build macro

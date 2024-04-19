@@ -6,6 +6,13 @@ Version: 1.2.0
 Release: 2.2%{?xsrel}%{?dist}
 
 License: BSD
+
+# !!!! YOUR ATTENTION PLEASE !!!!
+# Do not forget to run the script SOURCES/remove-certs-from-tarball.sh on new
+# source archive. This will remove the pem files from the source archive as we
+# are not supposed to distribute them in both RPM and SRPM. (This is why they
+# are removed from archive and not just deleted from the buildroot as it used
+# to be done)
 Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches

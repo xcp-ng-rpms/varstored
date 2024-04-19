@@ -62,6 +62,13 @@ when the guest is not running.
 %autosetup -p1
 %{?_cov_prepare}
 
+# Check for pem files in the source archive
+if find certs -name "*.pem" | grep -q pem; then
+  echo "pem files are present in the source archive"
+  echo "Please remove them using the script SOURCES/remove-certs-from-tarball.sh"
+  echo "and push the updated source archive"
+  false
+fi
 
 %build
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \

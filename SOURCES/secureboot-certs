@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script installs UEFI certificates for XCP-ng hosts.
@@ -15,7 +15,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from datetime import datetime
 from subprocess import Popen
@@ -107,7 +107,7 @@ def download(url, fname=None, tempdir=False, user_agent=DEFAULT_USER_AGENT):
     try:
         print("Downloading %s..." % url)
 
-        req = urllib2.Request(url)
+        req = urllib.request.Request(url)
         # For an unknown reason, microsoft.com reliably rejects the urllib2 User
         # Agent with error 403 (but oddly doesn't block the python-requests User
         # Agent). To avoid issues, just use the well-known Mozilla User Agent.
@@ -119,7 +119,7 @@ def download(url, fname=None, tempdir=False, user_agent=DEFAULT_USER_AGENT):
         req.add_header("Accept", "*/*")
         req.add_header("Connection", "keep-alive")
 
-        resp = urllib2.urlopen(req)
+        resp = urllib.request.urlopen(req)
         data = resp.read()
 
         with open(fname, "wb") as f:
@@ -128,7 +128,7 @@ def download(url, fname=None, tempdir=False, user_agent=DEFAULT_USER_AGENT):
         # Get abspath in temp dir before returning to original directory
         # (only matters if tempdir == True, but also correct if False)
         dest = os.path.abspath(fname)
-    except (urllib2.URLError, urllib2.HTTPError) as e:
+    except (urllib.error.URLError, urllib.error.HTTPError) as e:
         print(
             (
                 "error: unable to retrieve certificate from URL: %s. "

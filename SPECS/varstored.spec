@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: 2.3.1%{?xsrel}%{?dist}
 
 License: BSD
 
@@ -42,6 +42,9 @@ Requires: varstored-guard
 
 # XCP-ng: transition from uefistored, starting with XCP-ng 8.3
 Obsoletes: uefistored <= 1.3.0
+
+# XCP-ng: secureboot-certs is a python script
+Requires: python3
 
 %description
 A daemon for implementing variable services for UEFI guests.
@@ -114,6 +117,10 @@ make check
 
 
 %changelog
+* Tue Nov 26 2024 Yann Dirson <yann.dirson@vates.tech> - 1.2.0-2.3.1
+- switch secureboot-certs to python3
+- add missing dependency on python interpreter
+
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files
 - Add helper script to remove pem file from source archive

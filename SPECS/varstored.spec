@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: 2.4%{?xsrel}%{?dist}
 
 License: BSD
 
@@ -17,6 +17,22 @@ Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
+Source11: gen-sbvar.py
+
+# follows Templates/LegacyFirmwareDefaults.toml
+Source101: MicCorKEKCA2011_2011-06-24.der
+Source102: microsoft corporation kek 2k ca 2023.der
+Source103: MicWinProPCA2011_2011-10-19.der
+Source104: windows uefi ca 2023.der
+Source105: MicCorUEFCA2011_2011-06-27.der
+Source106: microsoft uefi ca 2023.der
+Source107: microsoft option rom uefi ca 2023.der
+Source108: MicWinProPCA2011_2011-10-19.der
+
+Source111: KEK_xcpng.json
+Source112: db_xcpng.json
+Source113: dbx_info_msft_06_10_25.json
+
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
@@ -71,10 +87,69 @@ if find certs -name "*.pem" | grep -q pem; then
 fi
 
 %build
+
+# XCP-ng: inject our certs/ directory and cert list
+rm -rf certs
+
+mkdir -p certs/KEK/
+cp \
+     "%{SOURCE101}" \
+     "%{SOURCE102}" \
+     -t certs/KEK/
+
+mkdir -p certs/db/
+cp \
+     "%{SOURCE103}" \
+     "%{SOURCE104}" \
+     "%{SOURCE105}" \
+     "%{SOURCE106}" \
+     "%{SOURCE107}" \
+     -t certs/db/
+
+mkdir -p certs/dbx/
+cp \
+     "%{SOURCE108}" \
+     -t certs/dbx/
+
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
               make %{?_smp_mflags} varstored tools create-auth PK.auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
+
+# XCP-ng: run gen-sbvar.py for KEK/db/dbx
+
+python3 %{SOURCE11} \
+     --var-name KEK \
+     --var-guid "8be4df61-93ca-11d2-aa0d-00e098032b8c" \
+     --architecture %{_arch} \
+     --input "%{SOURCE111}" \
+     --cert-search-path certs/KEK/ \
+     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --timestamp "2025-07-29T14:22:00+0000" \
+     --sets certificates \
+     --output KEK.auth
+
+python3 %{SOURCE11} \
+     --var-name db \
+     --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
+     --architecture %{_arch} \
+     --input "%{SOURCE112}" \
+     --cert-search-path certs/db/ \
+     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --timestamp "2025-07-29T14:22:00+0000" \
+     --sets certificates \
+     --output db.auth
+
+python3 %{SOURCE11} \
+     --var-name dbx \
+     --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
+     --architecture %{_arch} \
+     --input "%{SOURCE113}" \
+     --cert-search-path certs/dbx/ \
+     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --timestamp "2025-07-29T14:22:00+0000" \
+     --sets images \
+     --output dbx.auth
 
 
 %install
@@ -83,12 +158,13 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 PK.auth KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
-# XCP-ng: add secureboot-certs script
+# XCP-ng: add secureboot-certs and gen-sbvar.py script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
+install -m 755 %{SOURCE11} %{buildroot}/%{_sbindir}/gen-sbvar.py
 
 %{?_cov_install}
 
@@ -114,6 +190,12 @@ make check
 
 
 %changelog
+* Wed Jul 30 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
+- Add gen-sbvar.py
+- Generate {KEK,db,dbx}.auth using gen-sbvar.py
+- Update secureboot-certs to take builtin KEK/db/dbx
+- Update Secure Boot certs from microsoft/secureboot_objects@3f69ef4
+
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files
 - Add helper script to remove pem file from source archive

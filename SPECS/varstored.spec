@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: 2.4%{?xsrel}%{?dist}
 
 License: BSD
 
@@ -17,6 +17,16 @@ Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
+
+# follows Templates/LegacyFirmwareDefaults.toml
+Source100: MicCorKEKCA2011_2011-06-24.der
+Source101: microsoft corporation kek 2k ca 2023.der
+Source102: MicWinProPCA2011_2011-10-19.der
+Source103: windows uefi ca 2023.der
+Source104: MicCorUEFCA2011_2011-06-27.der
+Source105: microsoft uefi ca 2023.der
+Source106: microsoft option rom uefi ca 2023.der
+
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
@@ -26,6 +36,8 @@ Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
 Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/25
 Patch1004: 0003-create-auth-Add-a-option-for-append-writes.patch
+Patch1005: 0004-create-auth-Accept-DER-certificates.patch
+Patch1006: 0005-Makefile-use-xargs-to-parse-certificate-list.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -73,8 +85,38 @@ if find certs -name "*.pem" | grep -q pem; then
 fi
 
 %build
+
+# XCP-ng: inject our certs/ directory and cert list
+rm -rf certs
+
+mkdir -p certs/KEK/
+cp \
+     "%{SOURCE100}" \
+     "%{SOURCE101}" \
+     -t certs/KEK/
+echo \
+     \"%{SOURCE100}\" \
+     \"%{SOURCE101}\" \
+     > KEK.list
+
+mkdir -p certs/db/
+cp \
+     "%{SOURCE102}" \
+     "%{SOURCE103}" \
+     "%{SOURCE104}" \
+     "%{SOURCE105}" \
+     "%{SOURCE106}" \
+     -t certs/db/
+echo \
+     \"%{SOURCE102}\" \
+     \"%{SOURCE103}\" \
+     \"%{SOURCE104}\" \
+     \"%{SOURCE105}\" \
+     \"%{SOURCE106}\" \
+     > db.list
+
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
-              make %{?_smp_mflags} varstored tools create-auth PK.auth
+              make %{?_smp_mflags} varstored tools create-auth auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -85,7 +127,7 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
@@ -116,6 +158,14 @@ make check
 
 
 %changelog
+* Thu Jun 19 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
+- Restore generation of KEK.auth and db.auth
+- Update secureboot-certs to take builtin KEK/db
+- Update Secure Boot certs from microsoft/secureboot_objects@3f69ef4
+- [Patch] create-auth: Add -a option for append writes
+- [Patch] create-auth: Accept DER certificates
+- [Patch] Makefile: use xargs to parse certificate list
+
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files
 - Add helper script to remove pem file from source archive

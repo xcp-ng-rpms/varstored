@@ -35,9 +35,6 @@ __status__ = "Production"
 TEMPDIRS = []
 DEFAULT_USER_AGENT = "Mozilla/5.0 - Open source hypervisor"
 
-key = None
-crt = None
-
 
 def cd_tempdir():
     """Change directories to a temporary directory.
@@ -76,9 +73,6 @@ class Actions:
 
 
 class Urls:
-    CA = "https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt"
-    PCA = "https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt"
-    KEK = "https://www.microsoft.com/pkiops/certs/MicCorKEKCA2011_2011-06-24.crt"
     dbx = "https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin"
 
 
@@ -218,62 +212,6 @@ def create_auth(signing_key, signing_cert, var, *certs):
     return os.path.abspath(auth)
 
 
-def create_kek_keypair():
-    d = cd_tempdir()
-    key, crt = "KEK.key", "KEK.crt"
-    subprocess.check_call(
-        [
-            "openssl",
-            "req",
-            "-newkey",
-            "rsa:4096",
-            "-nodes",
-            "-new",
-            "-x509",
-            "-sha256",
-            "-days",
-            "3650",
-            "-subj",
-            "/CN=KEK Owner/",
-            "-keyout",
-            key,
-            "-out",
-            crt,
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    key, crt = os.path.abspath(key), os.path.abspath(crt)
-    os.chdir(d)
-    return key, crt
-
-
-def create_msft_kek(signing_key, signing_crt, user_agent=DEFAULT_USER_AGENT):
-    prevdir = cd_tempdir()
-    msft_kek = download(Urls.KEK, user_agent=user_agent)
-    kek_auth = create_auth(
-        signing_key, signing_crt, "KEK", signing_crt, convert_der_to_pem(msft_kek)
-    )
-    os.chdir(prevdir)
-    return kek_auth
-
-
-def create_msft_db(signing_key, signing_crt, user_agent=DEFAULT_USER_AGENT):
-    prevdir = cd_tempdir()
-    msft_ca = download(Urls.CA, user_agent=user_agent)
-    msft_pca = download(Urls.PCA, user_agent=user_agent)
-    db_auth = create_auth(
-        signing_key,
-        signing_crt,
-        "db",
-        convert_der_to_pem(msft_ca),
-        convert_der_to_pem(msft_pca),
-    )
-    os.chdir(prevdir)
-
-    return db_auth
-
-
 def session_init():
     session = XenAPI.xapi_local()
     ret = session.xenapi.login_with_password(
@@ -299,15 +237,12 @@ def create_tarball(paths):
 
 
 def getdefault(name, user_agent=DEFAULT_USER_AGENT):
-    global key
-    global crt
-
     if name == "PK":
         return "/usr/share/varstored/PK.auth"
     elif name == "db":
-        return create_msft_db(key, crt, user_agent=user_agent)
+        return "/usr/share/varstored/db.auth"
     elif name == "KEK":
-        return create_msft_kek(key, crt, user_agent=user_agent)
+        return "/usr/share/varstored/KEK.auth"
     elif name == "dbx":
         return download(Urls.dbx, "dbx.auth", tempdir=True, user_agent=user_agent)
     else:
@@ -684,23 +619,20 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 
-Important Note: all Microsoft certs are downloaded automatically from
-Microsoft's server, and therefore require network access.
+Important Note: dbx variable contents are downloaded automatically from
+the Internet, and therefore require network access.
 
 Certificate / auth file URLs:
-CA: {}
-PCA: {}
-KEK: {}
 dbx: {}
 """.format(
-            Urls.CA, Urls.PCA, Urls.KEK, Urls.dbx
+            Urls.dbx
         ),
     )
     install_parser.set_defaults(action=Actions.INSTALL)
 
     install_parser.add_argument(
         "--user-agent",
-        help="Sets a custom user agent to download default certificates from Microsoft.",
+        help="Sets a custom user agent to download default certificates from the Internet.",
         default=DEFAULT_USER_AGENT,
         nargs='?'
     )
@@ -833,7 +765,6 @@ be passed to {} as custom auth files.
         if args.action == Actions.CLEAR:
             clear(session)
         elif args.action == Actions.INSTALL:
-            key, crt = create_kek_keypair()
             install(session, args)
         elif args.action == Actions.REPORT:
             report(session, args.report_verbose)

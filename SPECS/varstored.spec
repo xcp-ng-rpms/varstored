@@ -3,16 +3,9 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: 2.4%{?xsrel}%{?dist}
 
 License: BSD
-
-# !!!! YOUR ATTENTION PLEASE !!!!
-# Do not forget to run the script SOURCES/remove-certs-from-tarball.sh on new
-# source archive. This will remove the pem files from the source archive as we
-# are not supposed to distribute them in both RPM and SRPM. (This is why they
-# are removed from archive and not just deleted from the buildroot as it used
-# to be done)
 Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
@@ -26,6 +19,8 @@ Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
 Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/25
 Patch1004: 0003-create-auth-Add-a-option-for-append-writes.patch
+Patch1005: 0004-create-auth-Accept-DER-certificates.patch
+Patch1006: 0005-Makefile-use-xargs-to-parse-certificate-list.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -64,17 +59,25 @@ when the guest is not running.
 %autosetup -p1
 %{?_cov_prepare}
 
-# Check for pem files in the source archive
-if find certs -name "*.pem" | grep -q pem; then
-  echo "pem files are present in the source archive"
-  echo "Please remove them using the script SOURCES/remove-certs-from-tarball.sh"
-  echo "and push the updated source archive"
-  false
-fi
 
 %build
+# XCP-ng: inject our certs/ directory and cert list
+rm -rf certs
+cp -r %{_sourcedir}/certs -t .
+echo \
+     \"certs/KEK/Certificates/MicCorKEKCA2011_2011-06-24.der\" \
+     \"certs/KEK/Certificates/microsoft corporation kek 2k ca 2023.der\" \
+     > KEK.list
+echo \
+     \"certs/DB/Certificates/MicWinProPCA2011_2011-10-19.der\" \
+     \"certs/DB/Certificates/windows uefi ca 2023.der\" \
+     \"certs/DB/Certificates/MicCorUEFCA2011_2011-06-27.der\" \
+     \"certs/DB/Certificates/microsoft uefi ca 2023.der\" \
+     \"certs/DB/Certificates/microsoft option rom uefi ca 2023.der\" \
+     > db.list
+
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
-              make %{?_smp_mflags} varstored tools create-auth PK.auth
+              make %{?_smp_mflags} varstored tools create-auth auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -85,7 +88,7 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
@@ -116,6 +119,14 @@ make check
 
 
 %changelog
+* Fri Feb 14 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
+- Restore generation of KEK.auth and db.auth
+- Remove the remove-certs-from-tarball.sh script which is no longer needed
+- Update Secure Boot certs from microsoft/secureboot_objects v1.3.1
+- [Patch] create-auth: Add -a option for append writes
+- [Patch] create-auth: Accept DER certificates
+- [Patch] Makefile: use xargs to parse certificate list
+
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files
 - Add helper script to remove pem file from source archive

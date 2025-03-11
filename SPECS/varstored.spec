@@ -17,6 +17,7 @@ Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
+Source11: gen-dbx.py
 
 # follows Templates/LegacyFirmwareDefaults.toml
 Source100: MicCorKEKCA2011_2011-06-24.der
@@ -26,6 +27,8 @@ Source103: windows uefi ca 2023.der
 Source104: MicCorUEFCA2011_2011-06-27.der
 Source105: microsoft uefi ca 2023.der
 Source106: microsoft option rom uefi ca 2023.der
+Source107: MicWinProPCA2011_2011-10-19.der
+Source108: dbx_info_msft_06_10_25.json
 
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
@@ -115,6 +118,11 @@ echo \
      \"%{SOURCE106}\" \
      > db.list
 
+mkdir -p certs/dbx/
+cp \
+     "%{SOURCE107}" \
+     -t certs/dbx/
+
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
               make %{?_smp_mflags} varstored tools create-auth auth
 
@@ -131,8 +139,23 @@ install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
-# XCP-ng: add secureboot-certs script
+# XCP-ng: run gen-dbx.py on Microsoft JSON sources
+# Use MICROSOFT_VENDOR_GUID and Microsoft's timestamp
+python3 %{SOURCE11} \
+     --architecture %{_arch} \
+     --input "%{SOURCE108}" \
+     --cert-search-path certs/dbx/ \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
+     --timestamp "2010-03-06T19:17:21+0000" \
+     --signer-cert PK.pem \
+     --signer-key PK.key \
+     --sets images \
+     --output dbx.auth
+install -m 644 dbx.auth %{buildroot}/%{_datadir}/%{name}
+
+# XCP-ng: add secureboot-certs and gen-dbx.py script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
+install -m 755 %{SOURCE11} %{buildroot}/%{_sbindir}/gen-dbx.py
 
 %{?_cov_install}
 
@@ -159,8 +182,9 @@ make check
 
 %changelog
 * Thu Jun 19 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
-- Restore generation of KEK.auth and db.auth
-- Update secureboot-certs to take builtin KEK/db
+- Add gen-dbx.py
+- Restore generation of KEK.auth, db.auth and dbx.auth
+- Update secureboot-certs to take builtin KEK/db/dbx
 - Update Secure Boot certs from microsoft/secureboot_objects@3f69ef4
 - [Patch] create-auth: Add -a option for append writes
 - [Patch] create-auth: Accept DER certificates

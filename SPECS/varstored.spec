@@ -10,6 +10,7 @@ Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
+Source11: gen-dbx.py
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
@@ -92,8 +93,23 @@ install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
-# XCP-ng: add secureboot-certs script
+# XCP-ng: run gen-dbx.py on Microsoft JSON sources
+# Use MICROSOFT_VENDOR_GUID and Microsoft's timestamp
+python3 %{_sourcedir}/gen-dbx.py \
+     --architecture %{_arch} \
+     --input %{_sourcedir}/certs/DBX/dbx_info_msft_1_14_25.json \
+     --cert-search-path %{_sourcedir}/certs/DBX/Certificates \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
+     --timestamp "2010-03-06T19:17:21+0000" \
+     --signer-cert PK.pem \
+     --signer-key PK.key \
+     --sets images \
+     --output dbx.auth
+install -m 644 dbx.auth %{buildroot}/%{_datadir}/%{name}
+
+# XCP-ng: add secureboot-certs and gen-dbx.py script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
+install -m 755 %{SOURCE11} %{buildroot}/%{_sbindir}/gen-dbx.py
 
 %{?_cov_install}
 
@@ -119,8 +135,9 @@ make check
 
 
 %changelog
-* Fri Feb 14 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
-- Restore generation of KEK.auth and db.auth
+* Fri Mar 11 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
+- Add gen-dbx.py
+- Restore generation of KEK.auth, db.auth and dbx.auth
 - Remove the remove-certs-from-tarball.sh script which is no longer needed
 - Update Secure Boot certs from microsoft/secureboot_objects v1.3.1
 - [Patch] create-auth: Add -a option for append writes

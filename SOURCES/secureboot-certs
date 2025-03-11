@@ -239,12 +239,12 @@ def create_tarball(paths):
 def getdefault(name, user_agent=DEFAULT_USER_AGENT):
     if name == "PK":
         return "/usr/share/varstored/PK.auth"
-    elif name == "db":
-        return "/usr/share/varstored/db.auth"
     elif name == "KEK":
         return "/usr/share/varstored/KEK.auth"
+    elif name == "db":
+        return "/usr/share/varstored/db.auth"
     elif name == "dbx":
-        return download(Urls.dbx, "dbx.auth", tempdir=True, user_agent=user_agent)
+        return "/usr/share/varstored/dbx.auth"
     else:
         return None
 
@@ -258,9 +258,11 @@ def getpath(args, name):
             return None
         logging.debug("using file %s for %s" % (val, name))
         return os.path.abspath(val)
-    elif val == "default" or val == "latest":
+    elif val == "default":
         logging.debug("%s for %s" % (val, name))
         return getdefault(name, user_agent=user_agent)
+    elif name == "dbx" and val == "latest":
+        return download(Urls.dbx, "dbx.auth", tempdir=True, user_agent=user_agent)
     elif name == "dbx" and val == "none":
         logging.debug("No path for dbx, set dbx to 'none'")
         return None
@@ -274,7 +276,7 @@ def validate_args(args):
         "PK": ["default"],
         "KEK": ["default"],
         "db": ["default"],
-        "dbx": ["latest", "none"],
+        "dbx": ["default", "latest", "none"],
     }
 
     for name in ["PK", "KEK", "db", "dbx"]:
@@ -612,7 +614,7 @@ if __name__ == "__main__":
         description=(
             "Install UEFI certificates to the pool.\n\n"
             "If no arguments are passed to '{} {}', then the default PK, KEK, "
-            "and db, and the latest dbx will be installed.".format(
+            "db and dbx will be installed.".format(
                 os.path.basename(sys.argv[0]), Actions.INSTALL
             )
         ),
@@ -681,7 +683,8 @@ dbx: {}
         "dbx",
         metavar="dbx",
         help="""
-'latest' for the most recent UEFI dbx, a path to a custom auth file, or 'none' for no dbx.
+'default' for the default dbx, 'latest' for the most recent UEFI dbx, a path to
+a custom auth file, or 'none' for no dbx.
 
 If a custom file, it must be an EFI .auth file, a DER-encoded X509 certificate,
 or a PEM X509 certificate.
@@ -691,22 +694,22 @@ benefit from Secure Boot. It renders Secure Boot practically meaningless
 because attackers may simply load any number of vulnerable binaries that were
 previously signed but later revoked, and thereby take control of the system.
 
-The 'latest' dbx revokes any software that hasn't implemented the most recent
-security fixes, which may include some OS distributions (even if they're
-totally updated, depending how recently the vulnerability was discovered).
-Because it varies per distribution, check if your guest distributions are
-updated to pass the most recent UEFI revocation before installing the latest
-dbx.
+The 'default' and 'latest' dbx revokes any software that hasn't implemented the
+most recent security fixes, which may include some OS distributions (even if
+they're totally updated, depending how recently the vulnerability was
+discovered). Because it varies per distribution, check if your guest
+distributions are updated to pass the most recent UEFI revocation before
+installing the latest dbx.
 
-Microsoft Windows may extend, replace, or modify the dbx for the VM in which it
-runs if the default KEK is used.
+Guests may extend, replace, or modify the dbx for the VM in which they run if
+the default KEK is used.
 
 For older dbx files, see: https://uefi.org/revocationlistfile/archive. They may
 be passed to {} as custom auth files.
 """.format(
             os.path.basename(sys.argv[0])
         ),
-        default='latest',
+        default='default',
         nargs='?'
     )
 

@@ -97,7 +97,7 @@ install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 # Use MICROSOFT_VENDOR_GUID and Microsoft's timestamp
 python3 %{_sourcedir}/gen-dbx.py \
      --architecture %{_arch} \
-     --input %{_sourcedir}/certs/DBX/dbx_info_msft_1_14_25.json \
+     --input %{_sourcedir}/certs/DBX/dbx_info_msft_06_10_25.json \
      --cert-search-path %{_sourcedir}/certs/DBX/Certificates \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2010-03-06T19:17:21+0000" \

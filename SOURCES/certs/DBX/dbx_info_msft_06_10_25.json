@@ -4160,7 +4160,147 @@
                 "companyName": "Howyar Technologies",
                 "dateOfAddition": "2024-11-01",
                 "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
-            }
+            },
+            {
+                "authenticodeHash": "C54A4060B3A76FA045B7B60EAEBC8389780376BA3EF1F63D417BA1B55BE3A093",
+                "hashType": "SHA256",
+                "flatHash": "445C6EBE7505C29613846E2B23FB960B001D7795C77DFF00B852250421DA77A4",
+                "filename": "BiosFlashShell-efi64-80.02.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "CBFA2A86144EB21D65A6B17245BAD4F73058436C7292BE56DC6EBAB29DA61606",
+                "hashType": "SHA256",
+                "flatHash": "A4A5D536E11A12E1023ED51ACDBA64107C5B463822D31C6F5F7855B32FF031D1",
+                "filename": "BiosFlashShell-efi64-81.02.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "9D7E7174C281C6526B44C632BAA8C3320ADD0C77DC90778CC148938829F45E5E",
+                "hashType": "SHA256",
+                "flatHash": "1BA53A168EA9F0C2835BBD11EC1DD4DCAE9D8C9312F8FFEE1362359844674870",
+                "filename": "Dtbios-efi64-70.17.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "9B1F35052CFC5FB06DAB5E8F7B47F081DA28D722DB59ADE253B9E38AB5A19847",
+                "hashType": "SHA256",
+                "flatHash": "821C96C73C476C194ED456F70826DA9BC06857A29B0EB6A0FE9B1286686DAD18",
+                "filename": "Dtbios-efi64-70.18.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "E3C5E55E84371D3F2FBCA2241EF0711FF80876EBF71BAB07D8E6E45AAA8B45AF",
+                "hashType": "SHA256",
+                "flatHash": "FBE157A9E4D1522A6A06BF9AACB7F4792EE631E4F8D447D7DBD81315178098A6",
+                "filename": "Dtbios-efi64-70.19.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "EE093913ABBD3D4CB85EA31375179A8B55A298353C03AFE5055AA4E8EBD10EC2",
+                "hashType": "SHA256",
+                "flatHash": "495157D91DFD7F1255C56E4C6A389DA5B35D1F542B35360512AAED05CFEDC880",
+                "filename": "Dtbios-efi64-70.20.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "B4E1880425F7857B741B921D04FD9276130927CF90A427C454B970E7A28EB88B",
+                "hashType": "SHA256",
+                "flatHash": "27E2C712A58ACA27B35E78303E46E24E50061C955743363AE6D10F5C9A823A6D",
+                "filename": "Dtbios-efi64-70.21.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "CDA0B4A59390B36E1B654850428CBB5B4C7B5E4349E87ACDE97FB5437D64D9FC",
+                "hashType": "SHA256",
+                "flatHash": "D3AFD86D86D52AF45964DF9ECD2B01EEE9B3A5468C660A88EA12E857D961DC42",
+                "filename": "Dtbios-efi64-70.22.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "C87EFD057497F90321D62A69B311912BE8EF8A045FE9C5E6BD5C8C1A41D6B295",
+                "hashType": "SHA256",
+                "flatHash": "FB4CE9A346B67C4C706834A95B81910DDE9C2CAFE4996D2BFBB8CAA4BAD8942D",
+                "filename": "Dtbios-efi64-71.17.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "9E19DD645235341A555DA6C065594543AE1E3918ECD37DF22DFEBE91E71C3A59",
+                "hashType": "SHA256",
+                "flatHash": "663A8A79C13174E7B262A1C49080F6E7A44B0717B006AB54B9D5D5CC5A6C9304",
+                "filename": "Dtbios-efi64-71.18.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "63F67824FDA998798964FF33B87441857DA92F3A8EE3E04166EEC315E6600FD1",
+                "hashType": "SHA256",
+                "flatHash": "71EDB98CBB9E136BE2E22AF4EC2727854D906B613185B46FA128DC559144F73F",
+                "filename": "Dtbios-efi64-71.19.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "0BC4F078388D41AB039F87AE84CF8D39302CCBDD70C4ADE02263EBFCE6DEF0F5",
+                "hashType": "SHA256",
+                "flatHash": "9F068CD3ABD8BC4291C3A3AAC3E009F90343DF138EA06D6940C689110BC7E687",
+                "filename": "Dtbios-efi64-71.20.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "E2AEC271B9596A461EB6D54D8B1785E4E4C615CFAD5F4504BCC0A329433A9747",
+                "hashType": "SHA256",
+                "flatHash": "799DDA62A826D774074B7DB847593020F95BC43A11C66CA7AE41691954D97CF5",
+                "filename": "Dtbios-efi64-71.21.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              },
+              {
+                "authenticodeHash": "6B4328EBCBE46ED9118FF2D4472DE329D70BA83016DF7A6F50F8AF923883BC54",
+                "hashType": "SHA256",
+                "flatHash": "A11996AAF7F32AA09F78DB608106E25A47970BFEEEC76D49AF743EEE71B55F06",
+                "filename": "Dtbios-efi64-71.22.efi",
+                "description": "CVE-2025-3052",
+                "companyName": "DT Research Inc",
+                "dateOfAddition": "2025-05-07",
+                "signingAuthority": "CN = Microsoft Corporation UEFI CA 2011"
+              }            
         ],
         "ia32": [
             {
@@ -6451,7 +6591,7 @@
 	},
     "certificates": [
         {
-            "value": "MicWinProPCA2011_2011-10-19.der",
+            "value": "WindowsProduction2011.cer",
             "subjectName": "CN = Microsoft Windows Production PCA 2011",
             "issuerName": "CN = Microsoft Root Certificate Authority 2010",
             "thumbprint": "580a6f4cc4e4b669b9ebdc1b2b3e087b80d0678d",

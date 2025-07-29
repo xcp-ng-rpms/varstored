@@ -19,6 +19,8 @@ Source0: varstored-1.2.0.tar.gz
 Source10: secureboot-certs
 Source11: gen-sbvar.py
 
+# varstored expects a self-signed PK.auth
+Source100: PK.auth
 # follows Templates/LegacyFirmwareDefaults.toml
 Source101: MicCorKEKCA2011_2011-06-24.der
 Source102: microsoft corporation kek 2k ca 2023.der
@@ -112,7 +114,7 @@ cp \
      -t certs/dbx/
 
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
-              make %{?_smp_mflags} varstored tools create-auth PK.auth
+              make %{?_smp_mflags} varstored tools create-auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -158,9 +160,12 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
+
+# XCP-ng: add our own self-signed PK.auth
+install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/%{name}
 
 # XCP-ng: add secureboot-certs and gen-sbvar.py script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
@@ -192,6 +197,7 @@ make check
 %changelog
 * Wed Jul 30 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
 - Add gen-sbvar.py
+- Add self-signed PK.auth blob
 - Generate {KEK,db,dbx}.auth using gen-sbvar.py
 - Update secureboot-certs to take builtin KEK/db/dbx
 - Update Secure Boot certs from microsoft/secureboot_objects@3f69ef4

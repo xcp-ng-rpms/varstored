@@ -1,9 +1,10 @@
-%global package_speccommit a436001f700e5f647bd32b7055b18d3d78774ce5
+%global package_speccommit 8fed1da9930c0f59796ee8cac5bf666d070c9d41
+%{!?xsrel: %global xsrel 3}
 %global package_srccommit v1.2.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2%{?xsrel}%{?dist}
+Release: %{?xsrel}%{?dist}
 
 License: BSD
 Source0: varstored-1.2.0.tar.gz
@@ -82,6 +83,10 @@ make check
 
 
 %changelog
+* Wed Jan 22 2025 XenServer Rebuild <rebuild@xenserver.com> - 1.2.0-3
+- Add yangtze release branch
+- CP-53310: XenServer 9 rebuild
+
 * Fri Jan 26 2024 Andrew Cooper <andrew.cooper3@citrix.com> - 1.2.0-2
 - Rebuild against libxenstore.so.4
 

@@ -1,9 +1,10 @@
-%global package_speccommit a436001f700e5f647bd32b7055b18d3d78774ce5
+%global package_speccommit 8fed1da9930c0f59796ee8cac5bf666d070c9d41
+%{!?xsrel: %global xsrel 3}
 %global package_srccommit v1.2.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: %{?xsrel}.1%{?dist}
 
 License: BSD
 
@@ -114,6 +115,13 @@ make check
 
 
 %changelog
+* Wed Aug 06 2025 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-3.1
+- Sync with 1.2.0-3
+- *** Upstream changelog ***
+  * Wed Jan 22 2025 XenServer Rebuild <rebuild@xenserver.com> - 1.2.0-3
+  - Add yangtze release branch
+  - CP-53310: XenServer 9 rebuild
+
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files
 - Add helper script to remove pem file from source archive

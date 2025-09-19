@@ -1,0 +1,10 @@
+{
+    "certificates": [
+        {
+            "value": "MicCorKEKCA2011_2011-06-24.der"
+        },
+        {
+            "value": "microsoft corporation kek 2k ca 2023.der"
+        }
+    ]
+}

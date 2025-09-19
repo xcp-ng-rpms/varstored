@@ -1,0 +1,19 @@
+{
+    "certificates": [
+        {
+            "value": "MicWinProPCA2011_2011-10-19.der"
+        },
+        {
+            "value": "windows uefi ca 2023.der"
+        },
+        {
+            "value": "MicCorUEFCA2011_2011-06-27.der"
+        },
+        {
+            "value": "microsoft uefi ca 2023.der"
+        },
+        {
+            "value": "microsoft option rom uefi ca 2023.der"
+        }
+    ]
+}

@@ -34,7 +34,6 @@ Source108: MicWinProPCA2011_2011-10-19.der
 
 Source111: KEK_xcpng.json
 Source112: db_xcpng.json
-Source113: dbx_info_msft_06_10_25.json
 
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
@@ -143,17 +142,6 @@ python3 %{SOURCE11} \
      --sets certificates \
      --output db.auth
 
-python3 %{SOURCE11} \
-     --var-name dbx \
-     --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
-     --architecture %{_arch} \
-     --input "%{SOURCE113}" \
-     --cert-search-path certs/dbx/ \
-     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
-     --timestamp "2025-07-29T14:22:00+0000" \
-     --sets images \
-     --output dbx.auth
-
 
 %install
 install -m 755 -d %{buildroot}/%{_sbindir}
@@ -161,7 +149,7 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 

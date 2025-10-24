@@ -1,0 +1,48 @@
+From 4407c4f9b8d6b48d7ee282fa8809761d88c14835 Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Fri, 24 Oct 2025 15:18:30 +0100
+Subject: [PATCH] CA-419599: Check DATA_LIMIT when appending
+
+A VM can exceed DATA_LIMIT when appending data which causes a subsequent
+failure when reloading the data from disk because DATA_LIMIT is checked
+then.
+
+Reported-by: Tu Dinh <ngoc-tu.dinh@vates.tech>
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+---
+ handler.c | 3 ++-
+ test.c    | 7 +++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/handler.c b/handler.c
+index 85b8889..37780b0 100644
+--- a/handler.c
++++ b/handler.c
+@@ -1757,7 +1757,8 @@ do_set_variable(uint8_t *comm_buf)
+                         }
+                     }
+ 
+-                    if (get_space_usage() + data_len > TOTAL_LIMIT) {
++                    if (l->data_len + data_len > DATA_LIMIT ||
++                            get_space_usage() + data_len > TOTAL_LIMIT) {
+                         serialize_result(&ptr, EFI_OUT_OF_RESOURCES);
+                         goto err;
+                     }
+diff --git a/test.c b/test.c
+index 70f2aaa..4de7e30 100644
+--- a/test.c
++++ b/test.c
+@@ -1507,6 +1507,13 @@ static void test_set_variable_resource_limit(void)
+     g_assert_cmpuint(status, ==, EFI_OUT_OF_RESOURCES);
+ 
+     sv_ok(tname1, &tguid1, tmp, DATA_LIMIT, ATTR_B);
++
++    /* Cannot exceed DATA_LIMIT by appending */
++    call_set_variable(tname1, &tguid1, tmp, 1, ATTR_B | EFI_VARIABLE_APPEND_WRITE, 0);
++    ptr = buf;
++    status = unserialize_uintn(&ptr);
++    g_assert_cmpuint(status, ==, EFI_OUT_OF_RESOURCES);
++
+     sv_ok(tname4, &tguid4, tmp, DATA_LIMIT, ATTR_B);
+ 
+     /* Use all the remaining space */

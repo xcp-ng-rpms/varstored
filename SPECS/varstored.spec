@@ -42,6 +42,8 @@ Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.pat
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/23
 Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
 Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
+# Variable append issue, backported from https://github.com/xapi-project/varstored/pull/27
+Patch1004: 4407c4f9b8d6b48d7ee282fa8809761d88c14835.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel

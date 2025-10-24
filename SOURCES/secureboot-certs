@@ -244,7 +244,7 @@ def getdefault(name, user_agent=DEFAULT_USER_AGENT):
     elif name == "db":
         return "/usr/share/varstored/db.auth"
     elif name == "dbx":
-        return "/usr/share/varstored/dbx.auth"
+        return None
     else:
         return None
 

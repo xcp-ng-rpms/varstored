@@ -4,7 +4,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: %{?xsrel}.1%{?dist}
+Release: %{?xsrel}.2%{?dist}
 
 License: BSD
 
@@ -186,6 +186,10 @@ make check
 
 
 %changelog
+* Fri Oct 24 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-3.2
+- dbx is no longer shipped by default
+- Fix issue with data size limit during appends
+
 * Mon Sep 22 2025 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-3.1
 - Sync with 1.2.0-3
 - *** Upstream changelog ***

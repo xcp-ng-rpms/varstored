@@ -276,9 +276,6 @@ if __name__ == "__main__":
                 if image.get("authenticodeHash"):
                     hash = bytes.fromhex(image.get("authenticodeHash"))
                     siglist_images.append(make_efi_signature_data_sha256(args.vendor_guid, hash))
-                if image.get("flatHash"):
-                    hash = bytes.fromhex(image.get("flatHash"))
-                    siglist_images.append(make_efi_signature_data_sha256(args.vendor_guid, hash))
             if siglist_images:
                 siglists.append(make_efi_signature_list(EFI_CERT_SHA256_GUID, siglist_images))
 

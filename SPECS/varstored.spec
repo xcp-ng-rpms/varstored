@@ -121,7 +121,13 @@ cp \
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
+# XCP-ng: PK.auth was generated and signed using vendor GUID
+# 9be025e2-415b-435d-ad61-6b3e094fc28d and timestamp 2025-07-29T14:22:00+0000.
+
 # XCP-ng: run gen-sbvar.py for KEK/db/dbx
+# MICROSOFT_VENDOR_GUID (77fa9abd-0359-4d32-bd60-28f4e78f784b) must be used for
+# SB information issued by Microsoft, so that updates could be deduplicated by
+# filter_signature_list.
 
 python3 %{SOURCE11} \
      --var-name KEK \
@@ -129,7 +135,7 @@ python3 %{SOURCE11} \
      --architecture %{_arch} \
      --input "%{SOURCE111}" \
      --cert-search-path certs/KEK/ \
-     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
      --output KEK.auth
@@ -140,7 +146,7 @@ python3 %{SOURCE11} \
      --architecture %{_arch} \
      --input "%{SOURCE112}" \
      --cert-search-path certs/db/ \
-     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
      --output db.auth
@@ -151,7 +157,7 @@ python3 %{SOURCE11} \
      --architecture %{_arch} \
      --input "%{SOURCE113}" \
      --cert-search-path certs/dbx/ \
-     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets images \
      --output dbx.auth

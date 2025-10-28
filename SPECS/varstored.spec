@@ -33,7 +33,7 @@ Source107: microsoft option rom uefi ca 2023.der
 
 Source111: KEK_xcpng.json
 Source112: db_xcpng.json
-Source113: dbx_info_msft_06_10_25.json
+Source113: dbx_info_msft_latest.json
 
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch

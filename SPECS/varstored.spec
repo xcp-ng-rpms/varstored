@@ -30,7 +30,6 @@ Source104: windows uefi ca 2023.der
 Source105: MicCorUEFCA2011_2011-06-27.der
 Source106: microsoft uefi ca 2023.der
 Source107: microsoft option rom uefi ca 2023.der
-Source108: MicWinProPCA2011_2011-10-19.der
 
 Source111: KEK_xcpng.json
 Source112: db_xcpng.json
@@ -113,7 +112,7 @@ cp \
 
 mkdir -p certs/dbx/
 cp \
-     "%{SOURCE108}" \
+     "%{SOURCE103}" \
      -t certs/dbx/
 
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \

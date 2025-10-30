@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3%{?xsrel}%{?dist}
+Release: 3.3%{?xsrel}%{?dist}
 
 License: BSD
 
@@ -126,6 +126,26 @@ make check
 
 
 %changelog
+* Thu Oct 30 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-3.3
+- Lab build based on 1.2.0-2.3 with the following backports:
+  - Fix issue with data size limit during appends
+  - Use our own stable PK
+- Add fix-efivars.py script
+
+* Mon Sep 22 2025 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-3.1
+- Sync with 1.2.0-3
+- *** Upstream changelog ***
+  * Wed Jan 22 2025 XenServer Rebuild <rebuild@xenserver.com> - 1.2.0-3
+  - Add yangtze release branch
+  - CP-53310: XenServer 9 rebuild
+
+* Wed Jul 30 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-2.4
+- Add gen-sbvar.py
+- Add self-signed PK.auth blob
+- Generate {KEK,db,dbx}.auth using gen-sbvar.py
+- Update secureboot-certs to take builtin KEK/db/dbx
+- Update Secure Boot certs from microsoft/secureboot_objects@3f69ef4
+
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files
 - Add helper script to remove pem file from source archive

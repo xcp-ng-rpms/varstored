@@ -19,6 +19,9 @@ Source0: varstored-1.2.0.tar.gz
 Source10: secureboot-certs
 Source12: fix-efivars.py
 
+# varstored expects a self-signed PK.auth
+Source100: PK.auth
+
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
@@ -76,7 +79,7 @@ fi
 
 %build
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
-              make %{?_smp_mflags} varstored tools create-auth PK.auth
+              make %{?_smp_mflags} varstored tools create-auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -87,9 +90,11 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
+
+# XCP-ng: add our own self-signed PK.auth
+install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/%{name}
 
 # XCP-ng: add secureboot-certs script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs

@@ -17,6 +17,8 @@ Source0: varstored-1.2.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
+Source12: fix-efivars.py
+
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
@@ -91,6 +93,9 @@ install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
 # XCP-ng: add secureboot-certs script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
+
+# XCP-ng: add fix-efivars script
+install -m 755 %{SOURCE12} %{buildroot}/%{_sbindir}/fix-efivars.py
 
 %{?_cov_install}
 

@@ -3,7 +3,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: 2.3.1%{?xsrel}%{?dist}
+Release: 2.3.1.ydi.2%{?xsrel}%{?dist}
 
 License: BSD
 
@@ -24,6 +24,8 @@ Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.pat
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/23
 Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
 Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
+# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/28
+Patch1004: 0001-Use-memory-barriers-defined-by-xen-headers.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -117,9 +119,10 @@ make check
 
 
 %changelog
-* Tue Nov 26 2024 Yann Dirson <yann.dirson@vates.tech> - 1.2.0-2.3.1
+* Tue Nov 26 2024 Yann Dirson <yann.dirson@vates.tech> - 1.2.0-2.3.1.ydi.2
 - switch secureboot-certs to python3
 - add missing dependency on python interpreter
+- add memory barrier definitions for aarch64
 
 * Fri Apr 19 2024 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-2.3
 - Remove generation and installation of KEK and db files

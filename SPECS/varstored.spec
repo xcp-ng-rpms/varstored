@@ -1,13 +1,13 @@
-%global package_speccommit 8fed1da9930c0f59796ee8cac5bf666d070c9d41
-%{!?xsrel: %global xsrel 3}
-%global package_srccommit v1.2.0
+%global package_speccommit 7b7c2c290189fc506c450dbeb5a4bc1478ecbe4b
+%{!?xsrel: %global xsrel 1}
+%global package_srccommit v1.3.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.2.0
+Version: 1.3.0
 Release: %{?xsrel}%{?dist}
 
 License: BSD
-Source0: varstored-1.2.0.tar.gz
+Source0: varstored-1.3.0.tar.gz
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -83,6 +83,11 @@ make check
 
 
 %changelog
+* Mon Oct 06 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.3.0-1
+- CP-309775: Add new Microsoft certificates
+- Fix varstore-sb-state exit code
+- Don't fail setup_keys if the optional dbx is missing
+
 * Wed Jan 22 2025 XenServer Rebuild <rebuild@xenserver.com> - 1.2.0-3
 - Add yangtze release branch
 - CP-53310: XenServer 9 rebuild

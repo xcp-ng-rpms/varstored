@@ -205,7 +205,7 @@ def convert_certificate(infile, outfile):
             )
             logging.info("OK")
             break
-        except:
+        except subprocess.CalledProcessError:
             pass
     else:
         raise Exception(f"Cannot convert certificate file {infile}")
@@ -272,7 +272,7 @@ if __name__ == "__main__":
             images: typing.List[dict] = data["images"][data_arch]
             for image in images:
                 if image["hashType"] not in ["SHA256"]:
-                    raise RuntimeError(f'Unsupported hash type {image["hashType"]}')
+                    raise RuntimeError(f"Unsupported hash type {image['hashType']}")
                 if image.get("authenticodeHash"):
                     hash = bytes.fromhex(image.get("authenticodeHash"))
                     siglist_images.append(make_efi_signature_data_sha256(args.vendor_guid, hash))

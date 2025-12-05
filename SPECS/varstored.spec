@@ -4,7 +4,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: %{?xsrel}.2%{?dist}
+Release: %{?xsrel}.4%{?dist}
 
 License: BSD
 
@@ -19,6 +19,7 @@ Source0: varstored-1.2.0.tar.gz
 # XCP-ng sources and patches
 Source10: secureboot-certs
 Source11: gen-sbvar.py
+Source12: fix-efivars.py
 
 # varstored expects a self-signed PK.auth
 Source100: PK.auth
@@ -30,10 +31,10 @@ Source104: windows uefi ca 2023.der
 Source105: MicCorUEFCA2011_2011-06-27.der
 Source106: microsoft uefi ca 2023.der
 Source107: microsoft option rom uefi ca 2023.der
-Source108: MicWinProPCA2011_2011-10-19.der
 
 Source111: KEK_xcpng.json
 Source112: db_xcpng.json
+Source113: dbx_info_msft_latest.json
 
 # Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
 Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
@@ -112,7 +113,7 @@ cp \
 
 mkdir -p certs/dbx/
 cp \
-     "%{SOURCE108}" \
+     "%{SOURCE103}" \
      -t certs/dbx/
 
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
@@ -120,7 +121,13 @@ cp \
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
+# XCP-ng: PK.auth was generated and signed using vendor GUID
+# 9be025e2-415b-435d-ad61-6b3e094fc28d and timestamp 2025-07-29T14:22:00+0000.
+
 # XCP-ng: run gen-sbvar.py for KEK/db/dbx
+# MICROSOFT_VENDOR_GUID (77fa9abd-0359-4d32-bd60-28f4e78f784b) must be used for
+# SB information issued by Microsoft, so that updates could be deduplicated by
+# filter_signature_list.
 
 python3 %{SOURCE11} \
      --var-name KEK \
@@ -128,7 +135,7 @@ python3 %{SOURCE11} \
      --architecture %{_arch} \
      --input "%{SOURCE111}" \
      --cert-search-path certs/KEK/ \
-     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
      --output KEK.auth
@@ -139,10 +146,21 @@ python3 %{SOURCE11} \
      --architecture %{_arch} \
      --input "%{SOURCE112}" \
      --cert-search-path certs/db/ \
-     --vendor-guid "9be025e2-415b-435d-ad61-6b3e094fc28d" \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
      --output db.auth
+
+python3 %{SOURCE11} \
+     --var-name dbx \
+     --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
+     --architecture %{_arch} \
+     --input "%{SOURCE113}" \
+     --cert-search-path certs/dbx/ \
+     --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
+     --timestamp "2025-07-29T14:22:00+0000" \
+     --sets images \
+     --output dbx.auth
 
 
 %install
@@ -151,7 +169,7 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
@@ -161,6 +179,9 @@ install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/%{name}
 # XCP-ng: add secureboot-certs and gen-sbvar.py script
 install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
 install -m 755 %{SOURCE11} %{buildroot}/%{_sbindir}/gen-sbvar.py
+
+# XCP-ng: add fix-efivars script
+install -m 755 %{SOURCE12} %{buildroot}/%{_sbindir}/fix-efivars.py
 
 %{?_cov_install}
 
@@ -186,9 +207,11 @@ make check
 
 
 %changelog
-* Fri Oct 24 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-3.2
-- dbx is no longer shipped by default
-- Fix issue with data size limit during appends
+* Tue Oct 28 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-3.4
+- Fix owner GUID of EFI_SIGNATURE_DATA structures
+- Restore dbx generation
+- Update dbx info to microsoft/secureboot_objects@e64d1a5c89e5 (v1.6.1)
+- Add fix-efivars.py script
 
 * Mon Sep 22 2025 Thierry Escande <thierry.escande@vates.tech> - 1.2.0-3.1
 - Sync with 1.2.0-3

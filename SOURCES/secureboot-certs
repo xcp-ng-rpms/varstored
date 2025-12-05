@@ -73,7 +73,7 @@ class Actions:
 
 
 class Urls:
-    dbx = "https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin"
+    dbx = "https://github.com/microsoft/secureboot_objects/raw/refs/heads/main/PostSignedObjects/DBX/amd64/DBXUpdate.bin"
 
 
 def hashfile(path):
@@ -244,7 +244,7 @@ def getdefault(name, user_agent=DEFAULT_USER_AGENT):
     elif name == "db":
         return "/usr/share/varstored/db.auth"
     elif name == "dbx":
-        return None
+        return "/usr/share/varstored/dbx.auth"
     else:
         return None
 

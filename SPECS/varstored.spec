@@ -1,20 +1,13 @@
-%global package_speccommit 8fed1da9930c0f59796ee8cac5bf666d070c9d41
-%{!?xsrel: %global xsrel 3}
-%global package_srccommit v1.2.0
+%global package_speccommit 7b7c2c290189fc506c450dbeb5a4bc1478ecbe4b
+%{!?xsrel: %global xsrel 1}
+%global package_srccommit v1.3.0
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.2.0
-Release: %{?xsrel}.4%{?dist}
+Version: 1.3.0
+Release: %{?xsrel}.1%{?dist}
 
 License: BSD
-
-# !!!! YOUR ATTENTION PLEASE !!!!
-# Do not forget to run the script SOURCES/remove-certs-from-tarball.sh on new
-# source archive. This will remove the pem files from the source archive as we
-# are not supposed to distribute them in both RPM and SRPM. (This is why they
-# are removed from archive and not just deleted from the buildroot as it used
-# to be done)
-Source0: varstored-1.2.0.tar.gz
+Source0: varstored-1.3.0.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
@@ -36,15 +29,8 @@ Source111: KEK_xcpng.json
 Source112: db_xcpng.json
 Source113: dbx_info_msft_latest.json
 
-# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
-Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
-# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
-Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.patch
-# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/23
-Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
-Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
 # Variable append issue, backported from https://github.com/xapi-project/varstored/pull/27
-Patch1004: 4407c4f9b8d6b48d7ee282fa8809761d88c14835.patch
+Patch1000: 4407c4f9b8d6b48d7ee282fa8809761d88c14835.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -207,6 +193,18 @@ make check
 
 
 %changelog
+* Wed Dec 17 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.0-1.1
+- Sync with XenServer 1.3.0-1
+- *** Upstream changelog ***
+  * Mon Oct 06 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.3.0-1
+  - CP-309775: Add new Microsoft certificates
+  - Fix varstore-sb-state exit code
+  - Don't fail setup_keys if the optional dbx is missing
+
+  * Wed Jan 22 2025 XenServer Rebuild <rebuild@xenserver.com> - 1.2.0-3
+  - Add yangtze release branch
+  - CP-53310: XenServer 9 rebuild
+
 * Tue Oct 28 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-3.4
 - Fix owner GUID of EFI_SIGNATURE_DATA structures
 - Restore dbx generation

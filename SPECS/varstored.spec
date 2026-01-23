@@ -4,7 +4,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: %{?xsrel}.5%{?dist}
+Release: %{?xsrel}.6%{?dist}
 
 License: BSD
 
@@ -208,6 +208,9 @@ make check
 
 
 %changelog
+* Fri Jan 23 2026 Philippe Coval <philippe.coval@vates.tech> - 1.2.0-3.6
+- Rebuild with openssl-3
+
 * Thu Jan 15 2026 Teddy Astie <teddy.astie@vates.tech> - 1.2.0-3.5
 - Fix for XSA-478
 

@@ -4,7 +4,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: %{?xsrel}.4%{?dist}
+Release: %{?xsrel}.5%{?dist}
 
 License: BSD
 
@@ -45,6 +45,7 @@ Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
 Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
 # Variable append issue, backported from https://github.com/xapi-project/varstored/pull/27
 Patch1004: 4407c4f9b8d6b48d7ee282fa8809761d88c14835.patch
+Patch1005: xsa478.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -207,6 +208,9 @@ make check
 
 
 %changelog
+* Thu Jan 15 2026 Teddy Astie <teddy.astie@vates.tech> - 1.2.0-3.5
+- Fix for XSA-478
+
 * Tue Oct 28 2025 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.2.0-3.4
 - Fix owner GUID of EFI_SIGNATURE_DATA structures
 - Restore dbx generation

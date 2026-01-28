@@ -1,13 +1,16 @@
-%global package_speccommit 7b7c2c290189fc506c450dbeb5a4bc1478ecbe4b
-%{!?xsrel: %global xsrel 1}
-%global package_srccommit v1.3.0
+%global package_speccommit 88a7824e4556a8e1ae55092e1e7e06d6173717b2
+%global usver 1.3.1
+%global xsver 2
+%global xsrel %{xsver}%{?xscount}%{?xshash}
+%global package_srccommit v1.3.1
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.3.0
+Version: 1.3.1
 Release: %{?xsrel}%{?dist}
 
 License: BSD
-Source0: varstored-1.3.0.tar.gz
+Source0: varstored-1.3.1.tar.gz
+Patch0: xsa478.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -83,6 +86,12 @@ make check
 
 
 %changelog
+* Mon Jan 12 2026 Andrew Cooper <andrew.cooper3@citrix.com> - 1.3.1-2
+- Fix for XSA-478 / CVE-2025-58151
+
+* Thu Nov 13 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.3.1-1
+- CA-419599: Check DATA_LIMIT when appending
+
 * Mon Oct 06 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.3.0-1
 - CP-309775: Add new Microsoft certificates
 - Fix varstore-sb-state exit code

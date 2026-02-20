@@ -4,7 +4,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.2.0
-Release: %{?xsrel}.6%{?dist}
+Release: %{?xsrel}.6~XCPNG2710.3%{?dist}
 
 License: BSD
 

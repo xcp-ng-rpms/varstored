@@ -1,20 +1,17 @@
-%global package_speccommit 8fed1da9930c0f59796ee8cac5bf666d070c9d41
-%{!?xsrel: %global xsrel 3}
-%global package_srccommit v1.2.0
+%global package_speccommit 88a7824e4556a8e1ae55092e1e7e06d6173717b2
+%global usver 1.3.1
+%global xsver 2
+%global xsrel %{xsver}%{?xscount}%{?xshash}
+%global package_srccommit v1.3.1
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.2.0
-Release: %{?xsrel}.6%{?dist}
+Version: 1.3.1
+Release: %{?xsrel}.1%{?dist}
 
 License: BSD
 
-# !!!! YOUR ATTENTION PLEASE !!!!
-# Do not forget to run the script SOURCES/remove-certs-from-tarball.sh on new
-# source archive. This will remove the pem files from the source archive as we
-# are not supposed to distribute them in both RPM and SRPM. (This is why they
-# are removed from archive and not just deleted from the buildroot as it used
-# to be done)
-Source0: varstored-1.2.0.tar.gz
+Source0: varstored-1.3.1.tar.gz
+Patch0: xsa478.patch
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
@@ -35,17 +32,6 @@ Source107: microsoft option rom uefi ca 2023.der
 Source111: KEK_xcpng.json
 Source112: db_xcpng.json
 Source113: dbx_info_msft_latest.json
-
-# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/17
-Patch1000: varstored-1.0.0-tolerate-missing-dbx-on-disk.XCP-ng.patch
-# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/21
-Patch1001: varstored-1.2.0-fix-return-code-for-varstore-sb-state-user.XCP-ng.patch
-# Patch submitted upstream as https://github.com/xapi-project/varstored/pull/23
-Patch1002: 0001-Auth-Add-support-to-make-KEK-and-DB-files-optional.patch
-Patch1003: 0002-Makefile-Add-EXTRA_CFLAGS-to-CFLAGS.patch
-# Variable append issue, backported from https://github.com/xapi-project/varstored/pull/27
-Patch1004: 4407c4f9b8d6b48d7ee282fa8809761d88c14835.patch
-Patch1005: xsa478.patch
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -83,14 +69,6 @@ when the guest is not running.
 %prep
 %autosetup -p1
 %{?_cov_prepare}
-
-# Check for pem files in the source archive
-if find certs -name "*.pem" | grep -q pem; then
-  echo "pem files are present in the source archive"
-  echo "Please remove them using the script SOURCES/remove-certs-from-tarball.sh"
-  echo "and push the updated source archive"
-  false
-fi
 
 %build
 
@@ -208,6 +186,20 @@ make check
 
 
 %changelog
+* Thu Jan 29 2026 Andriy Sultanov <andriy.sultanov@vates.tech> - 1.3.1-2.1
+- Sync with 1.3.1-2
+- *** Upstream changelog ***
+  * Mon Jan 12 2026 Andrew Cooper <andrew.cooper3@citrix.com> - 1.3.1-2
+  - Fix for XSA-478 / CVE-2025-58151
+
+  * Thu Nov 13 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.3.1-1
+  - CA-419599: Check DATA_LIMIT when appending
+
+  * Mon Oct 06 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.3.0-1
+  - CP-309775: Add new Microsoft certificates
+  - Fix varstore-sb-state exit code
+  - Don't fail setup_keys if the optional dbx is missing
+
 * Fri Jan 23 2026 Philippe Coval <philippe.coval@vates.tech> - 1.2.0-3.6
 - Rebuild with openssl-3
 

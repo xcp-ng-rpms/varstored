@@ -12,10 +12,6 @@ Signed-off-by: Andrew Cooper <andrew.cooper3@citrix.com>
 Reviewed-by: Frediano Ziglio <frediano.ziglio@citrix.com>
 Reviewed-by: Ross Lagerwall <ross.lagerwall@citrix.com>
 Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
----
- include/serialize.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
 diff --git a/include/serialize.h b/include/serialize.h
 index 04441ea8a372..1667868feab4 100644
 --- a/include/serialize.h
@@ -152,6 +148,3 @@ index 04441ea8a372..1667868feab4 100644
      *ptr += sizeof ret;
  
      return ret;
--- 
-2.39.5
-

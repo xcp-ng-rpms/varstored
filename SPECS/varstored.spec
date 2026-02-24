@@ -165,7 +165,7 @@ install -m 755 %{SOURCE12} %{buildroot}/%{_sbindir}/fix-efivars.py
 %{?_cov_install}
 
 %post
-test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name} || :
+test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name}
 
 %check
 make check

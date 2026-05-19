@@ -1,16 +1,16 @@
-%global package_speccommit 88a7824e4556a8e1ae55092e1e7e06d6173717b2
-%global usver 1.3.1
-%global xsver 2
-%global xsrel %{xsver}%{?xscount}%{?xshash}
-%global package_srccommit v1.3.1
+%global package_speccommit 5c327fe4ebc7d118a788a3b92758dcfd9df3126a
+%{!?xsrel: %global xsrel 2}
+%global package_srccommit v1.3.2
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.3.1
+Version: 1.3.2
 Release: %{?xsrel}%{?dist}
 
 License: BSD
-Source0: varstored-1.3.1.tar.gz
-Patch0: xsa478.patch
+Source0: varstored-1.3.2.tar.gz
+Source1: PK.auth
+Source2: KEK.auth
+Source3: db.auth
 
 BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-devel
 BuildRequires: glib2-devel
@@ -47,7 +47,7 @@ when the guest is not running.
 
 
 %build
-%{?_cov_wrap} make %{?_smp_mflags} varstored tools create-auth auth
+%{?_cov_wrap} make %{?_smp_mflags} varstored tools create-auth
 
 %{?_cov_make_model:%{_cov_make_model misc/coverity/model.c}}
 
@@ -58,7 +58,7 @@ install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
 install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
-install -m 644 PK.auth KEK.auth db.auth %{buildroot}/%{_datadir}/%{name}
+install -m 644 %{SOURCE1} %{SOURCE2} %{SOURCE3} %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
 install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
@@ -86,6 +86,14 @@ make check
 
 
 %changelog
+* Wed Apr 08 2026 Alex Brett <alex.brett@citrix.com> - 1.3.2-2
+- CP-311096: Use pre-signed auth data
+
+* Fri Mar 20 2026 Stephen Cheng <stephen.cheng@citrix.com> - 1.3.2-1
+- CP-311837: Add -g option for GUID in create-auth
+- CP-311836: Support detached signatures in create-auth utility
+- Remove xsa478.patch since the fix is now in upstream
+
 * Mon Jan 12 2026 Andrew Cooper <andrew.cooper3@citrix.com> - 1.3.1-2
 - Fix for XSA-478 / CVE-2025-58151
 

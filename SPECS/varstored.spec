@@ -1,17 +1,13 @@
-%global package_speccommit 88a7824e4556a8e1ae55092e1e7e06d6173717b2
-%global usver 1.3.1
-%global xsver 2
-%global xsrel %{xsver}%{?xscount}%{?xshash}
-%global package_srccommit v1.3.1
+%global package_speccommit 5c327fe4ebc7d118a788a3b92758dcfd9df3126a
+%{!?xsrel: %global xsrel 2}
+%global package_srccommit v1.3.2
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.3.1
+Version: 1.3.2
 Release: %{?xsrel}.1%{?dist}
 
 License: BSD
-
-Source0: varstored-1.3.1.tar.gz
-Patch0: xsa478.patch
+Source0: varstored-1.3.2.tar.gz
 
 # XCP-ng sources and patches
 Source10: secureboot-certs
@@ -186,6 +182,18 @@ make check
 
 
 %changelog
+* Tue May 19 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.2-2.1
+- Sync with 1.3.2-2
+- No change in auth data
+- *** Upstream changelog ***
+  * Wed Apr 08 2026 Alex Brett <alex.brett@citrix.com> - 1.3.2-2
+  - CP-311096: Use pre-signed auth data
+
+  * Fri Mar 20 2026 Stephen Cheng <stephen.cheng@citrix.com> - 1.3.2-1
+  - CP-311837: Add -g option for GUID in create-auth
+  - CP-311836: Support detached signatures in create-auth utility
+  - Remove xsa478.patch since the fix is now in upstream
+
 * Thu Jan 29 2026 Andriy Sultanov <andriy.sultanov@vates.tech> - 1.3.1-2.1
 - Sync with 1.3.1-2
 - *** Upstream changelog ***

@@ -9,11 +9,6 @@ Release: %{?xsrel}.1%{?dist}
 License: BSD
 Source0: varstored-1.3.2.tar.gz
 
-# XCP-ng sources and patches
-Source10: secureboot-certs
-Source11: gen-sbvar.py
-Source12: fix-efivars.py
-
 # varstored expects a self-signed PK.auth
 Source100: PK.auth
 # follows Templates/LegacyFirmwareDefaults.toml
@@ -33,6 +28,8 @@ BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-
 BuildRequires: glib2-devel
 BuildRequires: libseccomp-devel
 BuildRequires: gcc
+# XCP-ng-specific scripts
+BuildRequires: xcp-efivar-utils
 %{?_cov_buildrequires}
 
 # varstored now provides KEK.auth and db.auth that were
@@ -43,6 +40,9 @@ Conflicts: secureboot-certificates < 1.0.0-1
 Conflicts: xapi-core < 23.6.0-1
 
 Requires: varstored-guard
+
+# XCP-ng-specific scripts
+Requires: xcp-efivar-utils
 
 # XCP-ng: transition from uefistored, starting with XCP-ng 8.3
 Obsoletes: uefistored <= 1.3.0
@@ -99,12 +99,12 @@ cp \
 # XCP-ng: PK.auth was generated and signed using vendor GUID
 # 9be025e2-415b-435d-ad61-6b3e094fc28d and timestamp 2025-07-29T14:22:00+0000.
 
-# XCP-ng: run gen-sbvar.py for KEK/db/dbx
+# XCP-ng: run gen-sbvar for KEK/db/dbx
 # MICROSOFT_VENDOR_GUID (77fa9abd-0359-4d32-bd60-28f4e78f784b) must be used for
 # SB information issued by Microsoft, so that updates could be deduplicated by
 # filter_signature_list.
 
-python3 %{SOURCE11} \
+gen-sbvar \
      --var-name KEK \
      --var-guid "8be4df61-93ca-11d2-aa0d-00e098032b8c" \
      --architecture %{_arch} \
@@ -115,7 +115,7 @@ python3 %{SOURCE11} \
      --sets certificates \
      --output KEK.auth
 
-python3 %{SOURCE11} \
+gen-sbvar \
      --var-name db \
      --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
      --architecture %{_arch} \
@@ -126,7 +126,7 @@ python3 %{SOURCE11} \
      --sets certificates \
      --output db.auth
 
-python3 %{SOURCE11} \
+gen-sbvar \
      --var-name dbx \
      --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
      --architecture %{_arch} \
@@ -150,13 +150,6 @@ install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
 # XCP-ng: add our own self-signed PK.auth
 install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/%{name}
-
-# XCP-ng: add secureboot-certs and gen-sbvar.py script
-install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
-install -m 755 %{SOURCE11} %{buildroot}/%{_sbindir}/gen-sbvar.py
-
-# XCP-ng: add fix-efivars script
-install -m 755 %{SOURCE12} %{buildroot}/%{_sbindir}/fix-efivars.py
 
 %{?_cov_install}
 
@@ -182,6 +175,9 @@ make check
 
 
 %changelog
+#* next
+#- Migrate XCP-ng helper scripts to xcp-efivar-utils
+
 * Tue May 19 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.2-2.1
 - Sync with 1.3.2-2
 - No change in auth data

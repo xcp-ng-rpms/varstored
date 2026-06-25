@@ -1,14 +1,15 @@
-%global package_speccommit 5c327fe4ebc7d118a788a3b92758dcfd9df3126a
+%global package_speccommit 7d197d30becfe64213edecbda9fd57eec69c9c0e
 %{!?xsrel: %global xsrel 2}
-%global package_srccommit v1.3.2
+%global package_srccommit v1.3.4
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.3.2
+Version: 1.3.4
 Release: %{?xsrel}.1%{?dist}
 
 License: BSD
-Source0: varstored-1.3.2.tar.gz
+Source0: varstored-1.3.4.tar.gz
 
+# XCP-ng: we have a different generation logic for auth files
 # varstored expects a self-signed PK.auth
 Source100: PK.auth
 # follows Templates/LegacyFirmwareDefaults.toml
@@ -37,7 +38,11 @@ BuildRequires: xcp-efivar-utils
 Conflicts: secureboot-certificates < 1.0.0-1
 
 # Conflict with old XAPIs since the certificate directory moved.
-Conflicts: xapi-core < 23.6.0-1
+%if 0%{?xenserver} < 9
+Conflicts: xapi-core < 26.1.13-1
+%else
+Conflicts: xapi-core < 26.14.0-1
+%endif
 
 Requires: varstored-guard
 
@@ -142,7 +147,7 @@ gen-sbvar \
 install -m 755 -d %{buildroot}/%{_sbindir}
 install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
-install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
+install -m 755 tools/varstore-{ls,get,rm,set,sb-state,nvram-certcheck,authfile-certcheck} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
 install -m 644 KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
@@ -177,6 +182,23 @@ make check
 %changelog
 #* next
 #- Migrate XCP-ng helper scripts to xcp-efivar-utils
+#- Sync with 1.3.4-2
+#- *** Upstream changelog ***
+#  * Mon May 25 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.4-2
+#  - CP-312779: different xapi dependency on xs8 and xs9
+#
+#  * Wed May 20 2026 Alex Brett <alex.brett@citrix.com> - 1.3.4-1
+#  - CA-427740: Add missing barrier
+#
+#  * Wed May 20 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-2
+#  - miss nvram-certcheck and authfile-certcheck tools
+#
+#  * Mon May 18 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-1
+#  - CP-311721: uefi secureboot certificate upgrade
+#  - CA-426556: support set_variable v1 and v2 interface
+#
+#  * Wed Apr 08 2026 Alex Brett <alex.brett@citrix.com> - 1.3.2-2
+#  - CP-311096: Use pre-signed auth data
 
 * Tue May 19 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.2-2.1
 - Sync with 1.3.2-2

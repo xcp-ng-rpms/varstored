@@ -181,26 +181,26 @@ make check
 
 
 %changelog
-#* next
-#- Migrate XCP-ng helper scripts to xcp-efivar-utils
-#- Update dbx info to microsoft/secureboot_objects@v1.6.5
-#- Sync with 1.3.4-2
-#- *** Upstream changelog ***
-#  * Mon May 25 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.4-2
-#  - CP-312779: different xapi dependency on xs8 and xs9
-#
-#  * Wed May 20 2026 Alex Brett <alex.brett@citrix.com> - 1.3.4-1
-#  - CA-427740: Add missing barrier
-#
-#  * Wed May 20 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-2
-#  - miss nvram-certcheck and authfile-certcheck tools
-#
-#  * Mon May 18 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-1
-#  - CP-311721: uefi secureboot certificate upgrade
-#  - CA-426556: support set_variable v1 and v2 interface
-#
-#  * Wed Apr 08 2026 Alex Brett <alex.brett@citrix.com> - 1.3.2-2
-#  - CP-311096: Use pre-signed auth data
+* Wed Jul 15 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.4-2.1
+- Migrate XCP-ng helper scripts to xcp-efivar-utils
+- Update dbx info to microsoft/secureboot_objects@v1.6.5
+- Sync with 1.3.4-2
+- *** Upstream changelog ***
+  * Mon May 25 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.4-2
+  - CP-312779: different xapi dependency on xs8 and xs9
+
+  * Wed May 20 2026 Alex Brett <alex.brett@citrix.com> - 1.3.4-1
+  - CA-427740: Add missing barrier
+
+  * Wed May 20 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-2
+  - miss nvram-certcheck and authfile-certcheck tools
+
+  * Mon May 18 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-1
+  - CP-311721: uefi secureboot certificate upgrade
+  - CA-426556: support set_variable v1 and v2 interface
+
+  * Wed Apr 08 2026 Alex Brett <alex.brett@citrix.com> - 1.3.2-2
+  - CP-311096: Use pre-signed auth data
 
 * Tue May 19 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.2-2.1
 - Sync with 1.3.2-2

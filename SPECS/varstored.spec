@@ -182,6 +182,7 @@ make check
 %changelog
 #* next
 #- Migrate XCP-ng helper scripts to xcp-efivar-utils
+#- Update dbx info to microsoft/secureboot_objects@v1.6.5
 #- Sync with 1.3.4-2
 #- *** Upstream changelog ***
 #  * Mon May 25 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.4-2

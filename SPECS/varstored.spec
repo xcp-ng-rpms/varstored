@@ -74,27 +74,28 @@ when the guest is not running.
 %build
 
 # XCP-ng: stage our certs in a temp directory for building with gen-sbvar
-tmpdir=$(mktemp -d -p %{_builddir})
+tmpdir=$(mktemp -d -p "%{_builddir}")
 
-mkdir -p $tmpdir/KEK/
+
+mkdir -p "$tmpdir/KEK/"
 cp \
      "%{SOURCE101}" \
      "%{SOURCE102}" \
-     -t $tmpdir/KEK/
+     -t "$tmpdir/KEK/"
 
-mkdir -p $tmpdir/db/
+mkdir -p "$tmpdir/db/"
 cp \
      "%{SOURCE103}" \
      "%{SOURCE104}" \
      "%{SOURCE105}" \
      "%{SOURCE106}" \
      "%{SOURCE107}" \
-     -t $tmpdir/db/
+     -t "$tmpdir/db/"
 
-mkdir -p $tmpdir/dbx/
+mkdir -p "$tmpdir/dbx/"
 cp \
      "%{SOURCE103}" \
-     -t $tmpdir/dbx/
+     -t "$tmpdir/dbx/"
 
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
               make %{?_smp_mflags} varstored tools create-auth
@@ -114,7 +115,7 @@ gen-sbvar \
      --var-guid "8be4df61-93ca-11d2-aa0d-00e098032b8c" \
      --architecture %{_arch} \
      --input "%{SOURCE111}" \
-     --cert-search-path $tmpdir/KEK/ \
+     --cert-search-path "$tmpdir/KEK/" \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
@@ -125,7 +126,7 @@ gen-sbvar \
      --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
      --architecture %{_arch} \
      --input "%{SOURCE112}" \
-     --cert-search-path $tmpdir/db/ \
+     --cert-search-path "$tmpdir/db/" \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
@@ -136,7 +137,7 @@ gen-sbvar \
      --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
      --architecture %{_arch} \
      --input "%{SOURCE113}" \
-     --cert-search-path $tmpdir/dbx/ \
+     --cert-search-path "$tmpdir/dbx/" \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets images \

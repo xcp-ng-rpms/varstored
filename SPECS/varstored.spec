@@ -1,19 +1,15 @@
-%global package_speccommit 5c327fe4ebc7d118a788a3b92758dcfd9df3126a
+%global package_speccommit 7d197d30becfe64213edecbda9fd57eec69c9c0e
 %{!?xsrel: %global xsrel 2}
-%global package_srccommit v1.3.2
+%global package_srccommit v1.3.4
 Name: varstored
 Summary: EFI Variable Storage Daemon
-Version: 1.3.2
+Version: 1.3.4
 Release: %{?xsrel}.1%{?dist}
 
 License: BSD
-Source0: varstored-1.3.2.tar.gz
+Source0: varstored-1.3.4.tar.gz
 
-# XCP-ng sources and patches
-Source10: secureboot-certs
-Source11: gen-sbvar.py
-Source12: fix-efivars.py
-
+# XCP-ng: we have a different generation logic for auth files
 # varstored expects a self-signed PK.auth
 Source100: PK.auth
 # follows Templates/LegacyFirmwareDefaults.toml
@@ -33,6 +29,8 @@ BuildRequires: xen-libs-devel xen-dom0-libs-devel openssl openssl-devel libxml2-
 BuildRequires: glib2-devel
 BuildRequires: libseccomp-devel
 BuildRequires: gcc
+# XCP-ng-specific scripts
+BuildRequires: xcp-efivar-utils
 %{?_cov_buildrequires}
 
 # varstored now provides KEK.auth and db.auth that were
@@ -40,9 +38,16 @@ BuildRequires: gcc
 Conflicts: secureboot-certificates < 1.0.0-1
 
 # Conflict with old XAPIs since the certificate directory moved.
-Conflicts: xapi-core < 23.6.0-1
+%if 0%{?xenserver} < 9
+Conflicts: xapi-core < 26.1.13-1
+%else
+Conflicts: xapi-core < 26.14.0-1
+%endif
 
 Requires: varstored-guard
+
+# XCP-ng-specific scripts
+Requires: xcp-efivar-utils
 
 # XCP-ng: transition from uefistored, starting with XCP-ng 8.3
 Obsoletes: uefistored <= 1.3.0
@@ -68,28 +73,29 @@ when the guest is not running.
 
 %build
 
-# XCP-ng: inject our certs/ directory and cert list
-rm -rf certs
+# XCP-ng: stage our certs in a temp directory for building with gen-sbvar
+tmpdir=$(mktemp -d -p "%{_builddir}")
 
-mkdir -p certs/KEK/
+
+mkdir -p "$tmpdir/KEK/"
 cp \
      "%{SOURCE101}" \
      "%{SOURCE102}" \
-     -t certs/KEK/
+     -t "$tmpdir/KEK/"
 
-mkdir -p certs/db/
+mkdir -p "$tmpdir/db/"
 cp \
      "%{SOURCE103}" \
      "%{SOURCE104}" \
      "%{SOURCE105}" \
      "%{SOURCE106}" \
      "%{SOURCE107}" \
-     -t certs/db/
+     -t "$tmpdir/db/"
 
-mkdir -p certs/dbx/
+mkdir -p "$tmpdir/dbx/"
 cp \
      "%{SOURCE103}" \
-     -t certs/dbx/
+     -t "$tmpdir/dbx/"
 
 %{?_cov_wrap} EXTRA_CFLAGS=-DAUTH_ONLY_PK_REQUIRED \
               make %{?_smp_mflags} varstored tools create-auth
@@ -99,39 +105,39 @@ cp \
 # XCP-ng: PK.auth was generated and signed using vendor GUID
 # 9be025e2-415b-435d-ad61-6b3e094fc28d and timestamp 2025-07-29T14:22:00+0000.
 
-# XCP-ng: run gen-sbvar.py for KEK/db/dbx
+# XCP-ng: run gen-sbvar for KEK/db/dbx
 # MICROSOFT_VENDOR_GUID (77fa9abd-0359-4d32-bd60-28f4e78f784b) must be used for
 # SB information issued by Microsoft, so that updates could be deduplicated by
 # filter_signature_list.
 
-python3 %{SOURCE11} \
+gen-sbvar \
      --var-name KEK \
      --var-guid "8be4df61-93ca-11d2-aa0d-00e098032b8c" \
      --architecture %{_arch} \
      --input "%{SOURCE111}" \
-     --cert-search-path certs/KEK/ \
+     --cert-search-path "$tmpdir/KEK/" \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
      --output KEK.auth
 
-python3 %{SOURCE11} \
+gen-sbvar \
      --var-name db \
      --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
      --architecture %{_arch} \
      --input "%{SOURCE112}" \
-     --cert-search-path certs/db/ \
+     --cert-search-path "$tmpdir/db/" \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets certificates \
      --output db.auth
 
-python3 %{SOURCE11} \
+gen-sbvar \
      --var-name dbx \
      --var-guid "d719b2cb-3d3a-4596-a3bc-dad00e67656f" \
      --architecture %{_arch} \
      --input "%{SOURCE113}" \
-     --cert-search-path certs/dbx/ \
+     --cert-search-path "$tmpdir/dbx/" \
      --vendor-guid "77fa9abd-0359-4d32-bd60-28f4e78f784b" \
      --timestamp "2025-07-29T14:22:00+0000" \
      --sets images \
@@ -142,7 +148,7 @@ python3 %{SOURCE11} \
 install -m 755 -d %{buildroot}/%{_sbindir}
 install -m 755 %{name} %{buildroot}/%{_sbindir}/%{name}
 install -m 755 -d %{buildroot}/%{_bindir}
-install -m 755 tools/varstore-{ls,get,rm,set,sb-state} %{buildroot}/%{_bindir}
+install -m 755 tools/varstore-{ls,get,rm,set,sb-state,nvram-certcheck,authfile-certcheck} %{buildroot}/%{_bindir}
 install -m 755 -d %{buildroot}/%{_datadir}/%{name}
 install -m 644 KEK.auth db.auth dbx.auth %{buildroot}/%{_datadir}/%{name}
 mkdir -p %{buildroot}/opt/xensource/libexec/
@@ -150,13 +156,6 @@ install -m 755 create-auth %{buildroot}/opt/xensource/libexec/create-auth
 
 # XCP-ng: add our own self-signed PK.auth
 install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/%{name}
-
-# XCP-ng: add secureboot-certs and gen-sbvar.py script
-install -m 755 %{SOURCE10} %{buildroot}/%{_sbindir}/secureboot-certs
-install -m 755 %{SOURCE11} %{buildroot}/%{_sbindir}/gen-sbvar.py
-
-# XCP-ng: add fix-efivars script
-install -m 755 %{SOURCE12} %{buildroot}/%{_sbindir}/fix-efivars.py
 
 %{?_cov_install}
 
@@ -182,6 +181,27 @@ make check
 
 
 %changelog
+* Wed Jul 15 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.4-2.1
+- Migrate XCP-ng helper scripts to xcp-efivar-utils
+- Update dbx info to microsoft/secureboot_objects@v1.6.5
+- Sync with 1.3.4-2
+- *** Upstream changelog ***
+  * Mon May 25 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.4-2
+  - CP-312779: different xapi dependency on xs8 and xs9
+
+  * Wed May 20 2026 Alex Brett <alex.brett@citrix.com> - 1.3.4-1
+  - CA-427740: Add missing barrier
+
+  * Wed May 20 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-2
+  - miss nvram-certcheck and authfile-certcheck tools
+
+  * Mon May 18 2026 Chunjie Zhu <chunjie.zhu@citrix.com> - 1.3.3-1
+  - CP-311721: uefi secureboot certificate upgrade
+  - CA-426556: support set_variable v1 and v2 interface
+
+  * Wed Apr 08 2026 Alex Brett <alex.brett@citrix.com> - 1.3.2-2
+  - CP-311096: Use pre-signed auth data
+
 * Tue May 19 2026 Tu Dinh <ngoc-tu.dinh@vates.tech> - 1.3.2-2.1
 - Sync with 1.3.2-2
 - No change in auth data

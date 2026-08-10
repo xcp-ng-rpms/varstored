@@ -160,7 +160,7 @@ install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/%{name}
 %{?_cov_install}
 
 %post
-test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name} || :
+test "$(readlink %{_sharedstatedir}/%{name})" = %{_datadir}/%{name} || test -d %{_sharedstatedir}/%{name} || ln -sf -T %{_datadir}/%{name} %{_sharedstatedir}/%{name}
 
 %check
 make check

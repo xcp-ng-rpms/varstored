@@ -4,7 +4,7 @@
 Name: varstored
 Summary: EFI Variable Storage Daemon
 Version: 1.3.4
-Release: %{?xsrel}.1%{?dist}
+Release: %{?xsrel}.1~xeu.1%{?dist}
 
 License: BSD
 Source0: varstored-1.3.4.tar.gz
